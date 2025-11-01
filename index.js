@@ -112,6 +112,38 @@ function showStatus(message, type = "info", duration = 2500) {
     }, Math.max(duration, 1000));
 }
 
+async function populateBuildMeta() {
+    const versionEl = getElement("#cs-build-version");
+    const noteEl = getElement("#cs-build-note");
+    if (!versionEl || !noteEl) {
+        return;
+    }
+
+    const fallbackNote = "Manual single-character switcher inspired by Costume Switcher.";
+
+    try {
+        const manifestUrl = new URL("./manifest.json", import.meta.url);
+        const response = await fetch(manifestUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch manifest (${response.status})`);
+        }
+
+        const manifest = await response.json();
+        const versionLabel = manifest?.version ? `v${manifest.version}` : "Outfit Switcher";
+        versionEl.textContent = versionLabel;
+
+        if (manifest?.description) {
+            noteEl.textContent = `${manifest.description} Styled after Costume Switcher.`;
+        } else {
+            noteEl.textContent = fallbackNote;
+        }
+    } catch (error) {
+        console.warn(`${logPrefix} Unable to populate build metadata`, error);
+        versionEl.textContent = "Outfit Switcher";
+        noteEl.textContent = fallbackNote;
+    }
+}
+
 async function issueCostume(folder, { source = "ui" } = {}) {
     const normalized = normalizeCostumeFolder(folder);
     if (!normalized) {
@@ -337,8 +369,8 @@ function renderTriggers() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td class="cs-trigger-column cs-trigger-column-triggers">
-                <textarea class="text_pole cs-trigger-input" rows="2" placeholder="One trigger per line"></textarea>
-                <small class="cs-trigger-helper">Matches case-insensitive triggers just like the full Costume Switcher.</small>
+                <textarea class="text_pole cs-trigger-input" rows="2" placeholder="winter\nformal\n/regex/"></textarea>
+                <small class="cs-trigger-helper">Matches case-insensitive keywords, comma lists, or /regex/ entries—just like Costume Switcher.</small>
             </td>
             <td class="cs-trigger-column cs-trigger-column-folder">
                 <div class="cs-folder-picker">
@@ -360,7 +392,7 @@ function renderTriggers() {
 
     if (!profile.triggers.length) {
         const emptyRow = document.createElement("tr");
-        emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No triggers yet. Add one below.</td>`;
+        emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No triggers yet. Link a keyword to a variant so you can call it instantly.</td>`;
         tbody.appendChild(emptyRow);
     }
 }
@@ -436,10 +468,10 @@ function renderVariants() {
     profile.variants.forEach((variant, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td><input type="text" class="text_pole cs-variant-name" placeholder="Variant name" /></td>
+            <td><input type="text" class="text_pole cs-variant-name" placeholder="e.g., Winter Casual" /></td>
             <td>
                 <div class="cs-folder-picker">
-                    <input type="text" class="text_pole cs-variant-folder" placeholder="Subfolder" />
+                    <input type="text" class="text_pole cs-variant-folder" placeholder="Subfolder (e.g., winter/casual)" />
                     <button type="button" class="menu_button interactable cs-button-ghost cs-folder-button cs-variant-folder-select">
                         <i class="fa-solid fa-folder-open"></i>
                         <span>Pick Folder</span>
@@ -457,7 +489,7 @@ function renderVariants() {
 
     if (!profile.variants.length) {
         const emptyRow = document.createElement("tr");
-        emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No variants configured. Add one below.</td>`;
+        emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No variants yet. Add a look so you can trigger it without browsing folders.</td>`;
         tbody.appendChild(emptyRow);
     }
 }
@@ -559,6 +591,7 @@ async function init() {
     extension_settings[extensionName] = settings;
 
     await ensureSettingsPanel();
+    await populateBuildMeta();
     bindUI();
     showStatus("Ready", "info");
 }
