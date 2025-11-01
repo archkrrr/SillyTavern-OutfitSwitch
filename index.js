@@ -148,6 +148,95 @@ function escapeHtml(str) {
     return p.innerHTML;
 }
 
+function extractDirectoryFromFileList(fileList) {
+    const files = Array.from(fileList || []);
+    if (!files.length) {
+        return "";
+    }
+
+    const file = files[0];
+    if (file && typeof file.webkitRelativePath === "string" && file.webkitRelativePath) {
+        const segments = file.webkitRelativePath.split("/");
+        if (segments.length > 1) {
+            segments.pop();
+            return segments.join("/");
+        }
+        return file.webkitRelativePath;
+    }
+
+    if (file && typeof file.name === "string") {
+        return file.name;
+    }
+
+    return "";
+}
+
+function deriveRelativeFolder(folderPath) {
+    const normalized = normalizeCostumeFolder(folderPath);
+    if (!normalized) {
+        return "";
+    }
+
+    const base = normalizeCostumeFolder(getActiveProfile().baseFolder);
+    if (!base) {
+        return normalized;
+    }
+
+    const normalizedLower = normalized.toLowerCase();
+    const baseLower = base.toLowerCase();
+
+    if (normalizedLower === baseLower) {
+        return "";
+    }
+
+    if (normalizedLower.startsWith(`${baseLower}/`)) {
+        return normalized.slice(base.length + 1);
+    }
+
+    if (normalizedLower.startsWith(baseLower)) {
+        return normalized.slice(base.length).replace(/^\/+/, "");
+    }
+
+    return normalized;
+}
+
+function attachFolderPicker(button, targetInput, { mode = "absolute" } = {}) {
+    if (!button || !targetInput) {
+        return;
+    }
+
+    if (button.dataset.hasFolderPicker === "true") {
+        return;
+    }
+
+    const picker = document.createElement("input");
+    picker.type = "file";
+    picker.hidden = true;
+    picker.multiple = true;
+    picker.setAttribute("webkitdirectory", "true");
+    picker.setAttribute("directory", "true");
+
+    button.insertAdjacentElement("afterend", picker);
+    button.dataset.hasFolderPicker = "true";
+
+    button.addEventListener("click", () => {
+        picker.click();
+    });
+
+    picker.addEventListener("change", () => {
+        const folderPath = extractDirectoryFromFileList(picker.files);
+        if (!folderPath) {
+            picker.value = "";
+            return;
+        }
+
+        const value = mode === "relative" ? deriveRelativeFolder(folderPath) : normalizeCostumeFolder(folderPath);
+        targetInput.value = value;
+        targetInput.dispatchEvent(new Event("input", { bubbles: true }));
+        picker.value = "";
+    });
+}
+
 function handleEnableToggle(event) {
     settings.enabled = Boolean(event.target.checked);
     persistSettings("enabled");
@@ -173,6 +262,7 @@ function bindTriggerInputs(row, index) {
     const folderInput = row.querySelector(".cs-folder-input");
     const runButton = row.querySelector(".cs-trigger-run");
     const deleteButton = row.querySelector(".cs-trigger-delete");
+    const folderButton = row.querySelector(".cs-trigger-folder-select");
 
     const profile = getActiveProfile();
     triggerInput.value = profile.triggers[index].trigger;
@@ -206,6 +296,8 @@ function bindTriggerInputs(row, index) {
     deleteButton.addEventListener("click", () => {
         removeTriggerRow(index);
     });
+
+    attachFolderPicker(folderButton, folderInput, { mode: "relative" });
 }
 
 function renderTriggers() {
@@ -221,7 +313,15 @@ function renderTriggers() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="text_pole cs-trigger-input" placeholder="Trigger" /></td>
-            <td><input type="text" class="text_pole cs-folder-input" placeholder="Variant folder" /></td>
+            <td>
+                <div class="cs-folder-picker">
+                    <input type="text" class="text_pole cs-folder-input" placeholder="Variant folder" />
+                    <button type="button" class="menu_button interactable cs-button-ghost cs-folder-button cs-trigger-folder-select">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Pick Folder</span>
+                    </button>
+                </div>
+            </td>
             <td class="cs-trigger-actions">
                 <button type="button" class="menu_button interactable cs-trigger-run">Run</button>
                 <button type="button" class="menu_button interactable cs-trigger-delete">Remove</button>
@@ -259,6 +359,7 @@ function bindVariantInputs(row, index) {
     const folderInput = row.querySelector(".cs-variant-folder");
     const runButton = row.querySelector(".cs-variant-run");
     const deleteButton = row.querySelector(".cs-variant-delete");
+    const folderButton = row.querySelector(".cs-variant-folder-select");
 
     const profile = getActiveProfile();
     nameInput.value = profile.variants[index].name;
@@ -292,6 +393,8 @@ function bindVariantInputs(row, index) {
     deleteButton.addEventListener("click", () => {
         removeVariant(index);
     });
+
+    attachFolderPicker(folderButton, folderInput, { mode: "relative" });
 }
 
 function renderVariants() {
@@ -307,7 +410,15 @@ function renderVariants() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="text_pole cs-variant-name" placeholder="Variant name" /></td>
-            <td><input type="text" class="text_pole cs-variant-folder" placeholder="Subfolder" /></td>
+            <td>
+                <div class="cs-folder-picker">
+                    <input type="text" class="text_pole cs-variant-folder" placeholder="Subfolder" />
+                    <button type="button" class="menu_button interactable cs-button-ghost cs-folder-button cs-variant-folder-select">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Pick Folder</span>
+                    </button>
+                </div>
+            </td>
             <td class="cs-variant-actions">
                 <button type="button" class="menu_button interactable cs-variant-run">Run</button>
                 <button type="button" class="menu_button interactable cs-variant-delete">Remove</button>
@@ -356,6 +467,7 @@ async function runTriggerByName(triggerName, source = "slash") {
 function bindUI() {
     const enableCheckbox = getElement("#cs-enable");
     const baseFolderInput = getElement("#cs-base-folder");
+    const baseFolderButton = getElement("#cs-base-folder-select");
     const addVariantButton = getElement("#cs-add-variant");
     const addTriggerButton = getElement("#cs-add-trigger");
     const runBaseButton = getElement("#cs-run-base");
@@ -370,6 +482,8 @@ function bindUI() {
         baseFolderInput.value = profile.baseFolder;
         baseFolderInput.addEventListener("input", handleBaseFolderInput);
     }
+
+    attachFolderPicker(baseFolderButton, baseFolderInput, { mode: "absolute" });
 
     if (addVariantButton) {
         addVariantButton.addEventListener("click", () => addVariant());
