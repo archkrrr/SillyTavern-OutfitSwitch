@@ -103,6 +103,10 @@
     gap: 16px;
 }
 
+#outfit-switcher-settings.cs-theme .cs-card-body--stacked {
+    gap: 18px;
+}
+
 #outfit-switcher-settings.cs-theme .cs-header-card {
     gap: 18px;
 }
@@ -128,10 +132,57 @@
 
 #outfit-switcher-settings.cs-theme .cs-header-meta {
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 16px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-header-controls {
+    display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 18px;
     flex-wrap: wrap;
+}
+
+@media (min-width: 720px) {
+    #outfit-switcher-settings.cs-theme .cs-header-meta {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    #outfit-switcher-settings.cs-theme .cs-header-controls {
+        justify-content: flex-end;
+    }
+}
+
+#outfit-switcher-settings.cs-theme .cs-build-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--header-text);
+}
+
+#outfit-switcher-settings.cs-theme .cs-build-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 20%, rgba(0, 0, 0, 0.45));
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+#outfit-switcher-settings.cs-theme .cs-build-note {
+    font-size: 0.88rem;
+    color: var(--text-subtle);
 }
 
 #outfit-switcher-settings.cs-theme .cs-master-toggle {
@@ -277,6 +328,115 @@
     font-size: 0.86rem;
     color: var(--text-muted);
     line-height: 1.5;
+}
+
+#outfit-switcher-settings.cs-theme .cs-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-column--wide {
+    grid-column: 1 / -1;
+}
+
+#outfit-switcher-settings.cs-theme .cs-guide-card {
+    background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 28%, transparent), rgba(0, 0, 0, 0.25));
+    border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+    box-shadow: 0 12px 32px rgba(108, 92, 231, 0.12);
+}
+
+#outfit-switcher-settings.cs-theme .cs-tip-card {
+    background: linear-gradient(140deg, rgba(0, 0, 0, 0.22), rgba(255, 255, 255, 0.04));
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+#outfit-switcher-settings.cs-theme .cs-step-list {
+    counter-reset: cs-step;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-step-list li {
+    counter-increment: cs-step;
+    position: relative;
+    padding: 14px 16px 14px 54px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    display: grid;
+    gap: 6px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-step-list li::before {
+    content: counter(cs-step);
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 0 0 6px var(--accent-soft);
+}
+
+#outfit-switcher-settings.cs-theme .cs-step-list strong {
+    font-size: 0.98rem;
+    color: var(--header-text);
+}
+
+#outfit-switcher-settings.cs-theme .cs-step-list span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#outfit-switcher-settings.cs-theme .cs-tip-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-tip-list li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--header-text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+#outfit-switcher-settings.cs-theme .cs-tip-list li::before {
+    content: "•";
+    position: absolute;
+    left: 6px;
+    top: 0;
+    color: var(--accent-secondary);
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+#outfit-switcher-settings.cs-theme .cs-tip-list strong {
+    color: var(--header-text);
 }
 
 #outfit-switcher-settings.cs-theme .cs-table-scroll {
