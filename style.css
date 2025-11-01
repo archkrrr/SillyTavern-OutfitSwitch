@@ -81,14 +81,15 @@
     border-radius: inherit;
     background:
         radial-gradient(130% 130% at 12% 18%, color-mix(in srgb, var(--accent) 35%, transparent) 0%, transparent 70%),
-        radial-gradient(150% 135% at 88% 78%, color-mix(in srgb, var(--accent-secondary) 30%, transparent) 0%, transparent 72%),
+        radial-gradient(160% 150% at 88% 78%, color-mix(in srgb, var(--accent-secondary) 30%, transparent) 0%, transparent 74%),
+        radial-gradient(140% 180% at 30% 74%, rgba(10, 12, 24, 0.55) 0%, transparent 78%),
         linear-gradient(140deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-    opacity: 0.58;
+    opacity: 0.6;
     pointer-events: none;
     z-index: 1;
-    background-size: 220% 220%, 200% 200%, 180% 180%;
-    background-position: 10% 6%, 90% 94%, 50% 50%;
-    mix-blend-mode: screen;
+    background-size: 220% 220%, 200% 200%, 180% 220%, 180% 180%;
+    background-position: 10% 6%, 90% 94%, 34% 72%, 50% 50%;
+    mix-blend-mode: soft-light;
 }
 
 #outfit-switcher-settings.cs-theme .cs-card:not(.cs-header-card)::after {
@@ -97,23 +98,28 @@
 
 @keyframes cs-card-gradient-flow {
     0% {
-        background-position: 10% 6%, 90% 94%, 50% 50%;
+        background-position: 10% 6%, 90% 94%, 34% 72%, 50% 50%;
+        opacity: 0.6;
     }
 
     25% {
-        background-position: 32% 18%, 68% 82%, 62% 44%;
+        background-position: 32% 18%, 68% 82%, 58% 48%, 62% 44%;
+        opacity: 0.7;
     }
 
     55% {
-        background-position: 58% 42%, 42% 58%, 44% 62%;
+        background-position: 58% 42%, 42% 58%, 46% 66%, 44% 62%;
+        opacity: 0.56;
     }
 
     80% {
-        background-position: 26% 68%, 74% 32%, 56% 56%;
+        background-position: 26% 68%, 74% 32%, 28% 54%, 56% 56%;
+        opacity: 0.74;
     }
 
     100% {
-        background-position: 10% 6%, 90% 94%, 50% 50%;
+        background-position: 10% 6%, 90% 94%, 34% 72%, 50% 50%;
+        opacity: 0.6;
     }
 }
 
