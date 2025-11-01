@@ -1,26 +1,82 @@
 # Outfit Switcher for SillyTavern
 
-Outfit Switcher is the streamlined sibling to Costume Switcher—a focused companion that manages a single character’s wardrobe while borrowing the same automation backbone. Point the extension at one folder, add optional variants, and it will stream-watch every response to launch the correct costume the moment a keyword or regex fires. Manual overrides remain one click away, so you can keep dramatic reveals perfectly timed without juggling multiple profiles.
+Outfit Switcher is the slim single-character wardrobe manager that predated the modern **Outfit Lab** inside Costume Switcher. It watches streaming responses, fires the right costume the moment a keyword or regex hits, and keeps manual overrides one click away. The extension still works great for focused setups or legacy installs, but its ideas now live on inside Costume Switcher’s Outfit Lab with a richer UI and multi-character support.
+
+**Costume Switcher for SillyTavern**
+
+Costume Switcher is the companion piece to Lenny’s **Character Expressions** extension—it uses the same foundations, but instead of changing facial expressions it swaps the entire costume or avatar folder the moment a new speaker takes the spotlight. Install Costume Switcher (v3.3.0 and newer) and you will find the Outfit Lab panel that evolved from this project, complete with per-character wardrobe builders, trigger tooling, and live testers so you can tune behaviour without leaving the app.
+
+Think of Outfit Switcher as the little brother that proved the concept. Costume Switcher is the flagship, dressing the whole cast, sharing telemetry with Character Expressions, and shipping the Outfit Lab that now covers single-character workflows too. If you are starting fresh, install **Costume Switcher** and enable **Outfit Lab**—you will get everything documented here plus ensemble automation. Keep Outfit Switcher around only if you prefer its pared-back drawer or need a lightweight alternative for older SillyTavern builds.
+
+Under the hood both extensions listen to streaming output, score the mentions they care about, and update costumes instantly. Costume Switcher layers scene awareness, focus locks, and outfit variants on top, while Outfit Switcher keeps those smarts targeted at a single pipeline. The shared lineage means tips from the Outfit Lab directly improve your Outfit Switcher setup and vice versa.
+
+> **New to the Switcher family?** Start with **Costume Switcher** → enable **Outfit Lab** for single-character wardrobe control → consult the Character Expressions README for emotion swaps. Return here only if you need the archival Outfit Switcher drawer or a minimal install.
+
+## Prefer Costume Switcher’s Outfit Lab
+
+If you want the most current experience, install Costume Switcher and open the **Outfit Lab** card in its settings drawer. Outfit Switcher’s feature set lives inside that panel with extra safety rails, live testers, and multi-character awareness. Use this README as a quick-start companion while following the Outfit Lab flow inside Costume Switcher:
+
+1. **Prepare your character folders.** Mirror your SillyTavern directory so each performer—and their optional variants—has a clean subfolder. This keeps the Outfit Lab preview and Costume Switcher logs easy to follow.
+2. **Enable the lab in settings.** Open **Settings → Extensions → Costume Switcher**, scroll to **Outfit Lab**, and flip the toggle. The lab stays hidden until you opt in.
+3. **Add characters and defaults.** Create a card for each character, set their default costume folder, and optionally assign aliases so detections line up with your prose.
+4. **Build outfit variations.** Add variants with keywords or regex triggers, restrict them by match type or scene roster, and preview the resolved folder path before saving.
+5. **Test and iterate safely.** Use the Outfit Lab tester or the broader **Live Pattern Tester** to watch detections, outfit decisions, and skip reasons without sending live `/costume` commands.
+
+These steps mirror the “Outfit Lab” chapter of the Costume Switcher README. Once you are comfortable there, any remaining notes below show how the legacy Outfit Switcher drawer maps to the same concepts.
+
+---
+
+## Shared Wardrobe Workflow Tips
+
+Many of the wardrobe strategies from Costume Switcher translate directly to Outfit Switcher. Keep your SillyTavern character folders organised so every variant is easy to reference and debug later.
+
+### Prepare your character folders
+
+Organise each performer inside a readable directory tree. Subfolders can hold portrait variants, background art, or expression packs without leaking into other looks.
+
+```
+SillyTavern/data/default-user/characters/Frostglen Dorm/
+├── Ember Hart/
+├── Quinn Vale/
+└── Mira Snow/
+```
+
+If Ember occasionally switches into a winter outfit, add another directory—`Frostglen Dorm/Ember Hart/Winter Gala/`—and point an Outfit Switcher variant at that path. The base mapping still targets `Frostglen Dorm/Ember Hart`, while the variant appends the extra folder when its trigger (for example, "snowstorm" or a `/winter/i` regex) fires.
+
+### Organising multi-character cards
+
+When a single SillyTavern card contains several characters (bandmates, roommates, or rival teams), mirror that structure in your folders. Create a directory per character and add optional subfolders for alternate personas or shared scenes. Outfit Switcher can focus on the main performer, while Costume Switcher covers the ensemble if you need broader automation.
+
+```
+SillyTavern/data/default-user/characters/Neon Skyline/
+├── Lead Echo/
+├── Bass Nova/
+└── Drummer Pulse/
+```
+
+Use `Neon Skyline/Lead Echo`, `Neon Skyline/Bass Nova`, and `Neon Skyline/Drummer Pulse` as your base folders. When the group performs an acoustic set, prepare alternate directories such as `Neon Skyline/Lead Echo/Unplugged/` and assign Outfit Switcher variants to call them on demand.
 
 ---
 
 ## Contents
 
-1. [Highlights at a Glance](#highlights-at-a-glance)
-2. [Requirements](#requirements)
-3. [Installation](#installation)
-4. [Architecture Overview](#architecture-overview)
-5. [Trigger & Variant Model](#trigger--variant-model)
-6. [Getting Started in Five Minutes](#getting-started-in-five-minutes)
-7. [Tour of the Settings UI](#tour-of-the-settings-ui)
+1. [Prefer Costume Switcher’s Outfit Lab](#prefer-costume-switchers-outfit-lab)
+2. [Shared Wardrobe Workflow Tips](#shared-wardrobe-workflow-tips)
+3. [Highlights at a Glance](#highlights-at-a-glance)
+4. [Requirements](#requirements)
+5. [Installation](#installation)
+6. [Architecture Overview](#architecture-overview)
+7. [Trigger & Variant Model](#trigger--variant-model)
+8. [Getting Started in Five Minutes](#getting-started-in-five-minutes)
+9. [Tour of the Settings UI](#tour-of-the-settings-ui)
     1. [Character Card](#character-card)
     2. [Variant Gallery](#variant-gallery)
     3. [Trigger Table](#trigger-table)
     4. [Status & Tips](#status--tips)
-8. [Understanding Automatic Switches](#understanding-automatic-switches)
-9. [Slash Command Reference](#slash-command-reference)
-10. [Troubleshooting Checklist](#troubleshooting-checklist)
-11. [Support & Contributions](#support--contributions)
+10. [Understanding Automatic Switches](#understanding-automatic-switches)
+11. [Slash Command Reference](#slash-command-reference)
+12. [Troubleshooting Checklist](#troubleshooting-checklist)
+13. [Support & Contributions](#support--contributions)
 
 ---
 
