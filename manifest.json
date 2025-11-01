@@ -1,14 +1,14 @@
 {
-  "name": "Outfit Switcher",
-  "title": "Outfit Switcher",
-  "description": "Keeps a single character's outfits synchronized with the story stream.",
-  "display_name": "Outfit Switcher",
-  "loading_order": 10,
-  "js": "index.js",
-  "css": "style.css",
-  "author": "Archkr",
-  "version": "0.0.3",
-  "auto_update": true,
-  "homePage": "https://github.com/archkrrr/SillyTavern-CostumeSwitch-Testing",
-  "i18n": {}
+    "name": "Outfit Switcher",
+    "title": "Outfit Switcher",
+    "description": "Manual outfit triggers for a single SillyTavern character.",
+    "display_name": "Outfit Switcher",
+    "loading_order": 10,
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Archkr",
+    "version": "1.0.0",
+    "auto_update": true,
+    "homePage": "https://github.com/archkrrr/SillyTavern-OutfitSwitch",
+    "i18n": {}
 }
