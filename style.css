@@ -205,6 +205,13 @@
     color: var(--header-text);
 }
 
+#outfit-switcher-settings.cs-theme .cs-build-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 #outfit-switcher-settings.cs-theme .cs-build-pill {
     display: inline-flex;
     align-items: center;
@@ -218,6 +225,22 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     width: fit-content;
+}
+
+#outfit-switcher-settings.cs-theme .cs-experiment-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 24%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-secondary) 40%, transparent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--header-text);
 }
 
 #outfit-switcher-settings.cs-theme .cs-build-note {

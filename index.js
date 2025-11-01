@@ -991,7 +991,7 @@ async function populateBuildMeta() {
         return;
     }
 
-    const fallbackNote = "Manual single-character switcher inspired by Costume Switcher.";
+    const fallbackNote = "Outfit Switcher is an early preview extension. Expect rough edges, limited functionality, and breaking changes as the system evolves.";
 
     try {
         const manifestUrl = new URL("./manifest.json", import.meta.url);
@@ -1017,7 +1017,7 @@ async function populateBuildMeta() {
 
         const description = typeof manifest?.description === "string" ? manifest.description.trim() : "";
         if (description) {
-            noteEl.textContent = `${description} Styled after Costume Switcher.`;
+            noteEl.textContent = description;
         } else {
             noteEl.textContent = fallbackNote;
         }
