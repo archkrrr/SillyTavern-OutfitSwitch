@@ -1,7 +1,7 @@
 {
     "name": "Outfit Switcher",
     "title": "Outfit Switcher",
-    "description": "Manual outfit triggers for a single SillyTavern character.",
+    "description": "Outfit Switcher is an early preview extension. Expect rough edges, limited functionality, and breaking changes as the system evolves.",
     "display_name": "Outfit Switcher",
     "loading_order": 10,
     "js": "index.js",
