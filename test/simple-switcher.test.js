@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
     SCHEMA_VERSION,
+    buildStreamBuffer,
     composeCostumePath,
     defaultSettings,
     ensureSettingsShape,
@@ -172,5 +173,16 @@ test("find costume for text ignores entries without folders", () => {
 
     assert.equal(findCostumeForText(settings, "battle mode"), null);
     assert.deepEqual(findCostumeForText(settings, "Time to relax"), { costume: "casual", trigger: "Relax", type: "literal" });
+});
+
+test("build stream buffer concatenates tokens and trims to limit", () => {
+    const first = buildStreamBuffer("Hello", " ");
+    assert.equal(first, "Hello ");
+
+    const limited = buildStreamBuffer("abc", "def", { limit: 4 });
+    assert.equal(limited, "cdef");
+
+    const unlimited = buildStreamBuffer("abc", "def", { limit: 0 });
+    assert.equal(unlimited, "abcdef");
 });
 

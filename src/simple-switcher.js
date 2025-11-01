@@ -11,6 +11,18 @@ import {
     normalizeVariantEntry,
 } from "./profile-utils.js";
 
+export function buildStreamBuffer(previous, tokenText, { limit = 2000 } = {}) {
+    const base = typeof previous === "string" ? previous : "";
+    const token = typeof tokenText === "string" ? tokenText : "";
+    const combined = base + token;
+
+    if (!Number.isFinite(limit) || limit <= 0) {
+        return combined;
+    }
+
+    return combined.length > limit ? combined.slice(-limit) : combined;
+}
+
 function uniqueFlags(flags) {
     const list = Array.from(new Set(String(flags || "").split("")));
     return list.join("");

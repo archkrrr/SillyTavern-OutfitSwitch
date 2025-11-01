@@ -10,6 +10,7 @@ import {
     normalizeCostumeFolder,
     normalizeTriggerEntry,
     normalizeVariantEntry,
+    buildStreamBuffer,
 } from "./src/simple-switcher.js";
 import { getOutfitSlashCommandConfig } from "./src/verbs.js";
 
@@ -24,7 +25,13 @@ const automationState = {
     registered: false,
     lastMessageSignature: null,
     lastAppliedCostume: null,
+    streamKey: null,
+    streamBuffer: "",
+    streamIssuedCostume: null,
+    streamTrigger: null,
 };
+
+const STREAM_BUFFER_LIMIT = 2000;
 
 const AUTO_SAVE_DEBOUNCE_MS = 800;
 const AUTO_SAVE_NOTICE_COOLDOWN_MS = 1800;
@@ -156,9 +163,17 @@ function flushAutoSave({ force = false, overrideMessage, showStatusMessage = tru
     return true;
 }
 
+function resetStreamTracking() {
+    automationState.streamKey = null;
+    automationState.streamBuffer = "";
+    automationState.streamIssuedCostume = null;
+    automationState.streamTrigger = null;
+}
+
 function resetAutomationTracking() {
     automationState.lastMessageSignature = null;
     automationState.lastAppliedCostume = null;
+    resetStreamTracking();
 }
 
 function buildMessageSignature(details) {
@@ -277,6 +292,79 @@ function extractMessageDetails(args) {
     return { text: "", isUser: false, key: null, id: null };
 }
 
+function resolveStreamReference(args) {
+    for (const arg of args) {
+        if (arg == null) {
+            continue;
+        }
+
+        if (typeof arg === "number" && Number.isFinite(arg)) {
+            return `m${arg}`;
+        }
+
+        if (typeof arg === "string" && arg.trim()) {
+            return arg.trim();
+        }
+
+        if (typeof arg === "object") {
+            const stringCandidates = [
+                arg.bufKey,
+                arg.key,
+                arg.messageKey,
+                arg.generationType,
+                arg.streamKey,
+            ];
+            for (const value of stringCandidates) {
+                if (typeof value === "string" && value.trim()) {
+                    return value.trim();
+                }
+            }
+
+            const numberCandidates = [arg.messageId, arg.mesId, arg.id];
+            for (const value of numberCandidates) {
+                if (Number.isFinite(value)) {
+                    return `m${value}`;
+                }
+            }
+
+            if (typeof arg.message === "object" && arg.message !== null) {
+                const nested = resolveStreamReference([arg.message]);
+                if (nested) {
+                    return nested;
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
+function resolveStreamTokenText(args) {
+    if (!Array.isArray(args) || !args.length) {
+        return "";
+    }
+
+    const first = args[0];
+    if (typeof first === "number") {
+        return String(args[1] ?? "");
+    }
+
+    if (typeof first === "object" && first !== null) {
+        const token = first.token ?? first.text ?? first.value;
+        if (token != null) {
+            return String(token);
+        }
+    }
+
+    for (const arg of args) {
+        if (typeof arg === "string" && arg) {
+            return arg;
+        }
+    }
+
+    return "";
+}
+
 function automationMessageHandler(...args) {
     if (!settings.enabled) {
         return;
@@ -294,6 +382,13 @@ function automationMessageHandler(...args) {
     }
 
     const signature = buildMessageSignature(details);
+
+    if (automationState.streamIssuedCostume && automationState.streamIssuedCostume === match.costume) {
+        automationState.lastMessageSignature = signature;
+        automationState.lastAppliedCostume = match.costume;
+        resetStreamTracking();
+        return;
+    }
     if (
         signature
         && automationState.lastMessageSignature === signature
@@ -309,6 +404,59 @@ function automationMessageHandler(...args) {
     issueCostume(match.costume, { source: "automation" });
 }
 
+function automationGenerationStartedHandler(...args) {
+    resetStreamTracking();
+    if (!settings.enabled) {
+        return;
+    }
+
+    const reference = resolveStreamReference(args);
+    if (reference) {
+        automationState.streamKey = reference;
+    } else {
+        automationState.streamKey = `stream-${Date.now()}`;
+    }
+}
+
+function automationStreamHandler(...args) {
+    if (!settings.enabled) {
+        return;
+    }
+
+    const profile = getActiveProfile();
+    if (!profile) {
+        return;
+    }
+
+    const tokenText = resolveStreamTokenText(args);
+    if (!tokenText) {
+        return;
+    }
+
+    if (!automationState.streamKey) {
+        const reference = resolveStreamReference(args);
+        automationState.streamKey = reference || `stream-${Date.now()}`;
+    }
+
+    automationState.streamBuffer = buildStreamBuffer(automationState.streamBuffer, tokenText, { limit: STREAM_BUFFER_LIMIT });
+
+    const match = findCostumeForText(profile, automationState.streamBuffer);
+    if (!match || !match.costume) {
+        return;
+    }
+
+    if (automationState.streamIssuedCostume === match.costume) {
+        return;
+    }
+
+    automationState.streamIssuedCostume = match.costume;
+    automationState.streamTrigger = match.trigger;
+    automationState.lastAppliedCostume = match.costume;
+
+    console.log(`${logPrefix} Streaming auto-switching to "${match.costume}" (triggered by ${match.trigger}).`);
+    issueCostume(match.costume, { source: "automation" });
+}
+
 function registerAutomationHandlers() {
     if (automationState.registered || !eventSource?.on) {
         return;
@@ -318,12 +466,26 @@ function registerAutomationHandlers() {
 
     const events = [event_types?.CHARACTER_MESSAGE_RENDERED, event_types?.MESSAGE_RENDERED]
         .filter((eventName) => typeof eventName === "string");
+    const streamEvents = [event_types?.STREAM_TOKEN_RECEIVED]
+        .filter((eventName) => typeof eventName === "string");
+    const generationEvents = [event_types?.GENERATION_STARTED]
+        .filter((eventName) => typeof eventName === "string");
     const resetEvents = [event_types?.CHAT_CHANGED]
         .filter((eventName) => typeof eventName === "string");
 
     events.forEach((eventName) => {
         eventSource.on(eventName, automationMessageHandler);
         automationState.handlers.push({ eventName, handler: automationMessageHandler });
+    });
+
+    streamEvents.forEach((eventName) => {
+        eventSource.on(eventName, automationStreamHandler);
+        automationState.handlers.push({ eventName, handler: automationStreamHandler });
+    });
+
+    generationEvents.forEach((eventName) => {
+        eventSource.on(eventName, automationGenerationStartedHandler);
+        automationState.handlers.push({ eventName, handler: automationGenerationStartedHandler });
     });
 
     resetEvents.forEach((eventName) => {
