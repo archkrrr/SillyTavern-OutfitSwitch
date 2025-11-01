@@ -109,6 +109,13 @@
 
 #outfit-switcher-settings.cs-theme .cs-header-card {
     gap: 18px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.26), rgba(46, 213, 115, 0.18));
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--accent) 35%, transparent),
+        color-mix(in srgb, var(--accent-secondary) 24%, transparent)
+    );
+    color: var(--header-text);
 }
 
 #outfit-switcher-settings.cs-theme .cs-header-intro {

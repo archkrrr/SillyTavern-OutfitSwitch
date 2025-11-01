@@ -19,6 +19,21 @@ let settings = ensureSettingsShape(extension_settings[extensionName] || defaultS
 let statusTimer = null;
 let settingsPanelPromise = null;
 
+const AUTO_SAVE_DEBOUNCE_MS = 800;
+const AUTO_SAVE_NOTICE_COOLDOWN_MS = 1800;
+const AUTO_SAVE_REASON_OVERRIDES = {
+    enabled: "the master toggle",
+    baseFolder: "the base folder",
+    variants: "your variants",
+    triggers: "your triggers",
+};
+
+const autoSaveState = {
+    timer: null,
+    pendingReasons: new Set(),
+    lastNoticeAt: new Map(),
+};
+
 extension_settings[extensionName] = settings;
 
 function getActiveProfile() {
@@ -43,6 +58,102 @@ function persistSettings(reason = "update") {
     } catch (err) {
         console.error(`${logPrefix} Failed to save settings`, err);
     }
+}
+
+function clearAutoSaveTimer() {
+    if (autoSaveState.timer) {
+        clearTimeout(autoSaveState.timer);
+        autoSaveState.timer = null;
+    }
+}
+
+function formatAutoSaveReason(key) {
+    if (!key) {
+        return "changes";
+    }
+
+    if (Object.prototype.hasOwnProperty.call(AUTO_SAVE_REASON_OVERRIDES, key)) {
+        return AUTO_SAVE_REASON_OVERRIDES[key];
+    }
+
+    return key
+        .replace(/([A-Z])/g, " $1")
+        .trim()
+        .toLowerCase();
+}
+
+function summarizeAutoSaveReasons(reasonSet) {
+    const list = Array.from(reasonSet || []).filter(Boolean);
+    if (!list.length) {
+        return "changes";
+    }
+
+    if (list.length === 1) {
+        return list[0];
+    }
+
+    const head = list.slice(0, -1).join(", ");
+    const tail = list[list.length - 1];
+    return head ? `${head} and ${tail}` : tail;
+}
+
+function announceAutoSaveIntent(element, reason, message, key) {
+    const noticeKey = key
+        || element?.dataset?.changeNoticeKey
+        || element?.id
+        || element?.name
+        || (reason ? reason.replace(/\s+/g, "-") : "auto-save");
+
+    const now = Date.now();
+    const last = autoSaveState.lastNoticeAt.get(noticeKey);
+    if (last && now - last < AUTO_SAVE_NOTICE_COOLDOWN_MS) {
+        return;
+    }
+
+    autoSaveState.lastNoticeAt.set(noticeKey, now);
+    const noticeMessage = message
+        || element?.dataset?.changeNotice
+        || (reason ? `Auto-saving ${reason}…` : "Auto-saving changes…");
+    showStatus(noticeMessage, "info", 2000);
+}
+
+function scheduleAutoSave({ key, reason, element, noticeMessage, noticeKey, debounceMs = AUTO_SAVE_DEBOUNCE_MS, announce = true } = {}) {
+    const reasonText = reason || formatAutoSaveReason(key);
+    if (reasonText) {
+        autoSaveState.pendingReasons.add(reasonText);
+    }
+
+    if (announce) {
+        announceAutoSaveIntent(element, reasonText, noticeMessage, noticeKey || key);
+    }
+
+    clearAutoSaveTimer();
+    const delay = Number.isFinite(debounceMs) && debounceMs >= 0 ? debounceMs : AUTO_SAVE_DEBOUNCE_MS;
+    autoSaveState.timer = setTimeout(() => {
+        flushAutoSave({});
+    }, delay);
+}
+
+function flushAutoSave({ force = false, overrideMessage, showStatusMessage = true } = {}) {
+    const hasPending = autoSaveState.pendingReasons.size > 0;
+    if (!hasPending && !force) {
+        return false;
+    }
+
+    const summary = summarizeAutoSaveReasons(autoSaveState.pendingReasons);
+    clearAutoSaveTimer();
+    persistSettings("auto-save");
+    autoSaveState.pendingReasons.clear();
+
+    const message = overrideMessage !== undefined
+        ? overrideMessage
+        : (hasPending ? `Auto-saved ${summary}.` : null);
+
+    if (message && showStatusMessage) {
+        showStatus(message, "success", 2000);
+    }
+
+    return true;
 }
 
 function getElement(selector) {
@@ -129,17 +240,32 @@ async function populateBuildMeta() {
         }
 
         const manifest = await response.json();
-        const versionLabel = manifest?.version ? `v${manifest.version}` : "Outfit Switcher";
+        const rawVersion = typeof manifest?.version === "string" ? manifest.version.trim() : "";
+        const versionLabel = rawVersion ? `v${rawVersion}` : (manifest?.title || manifest?.display_name || "Outfit Switcher");
         versionEl.textContent = versionLabel;
 
-        if (manifest?.description) {
-            noteEl.textContent = `${manifest.description} Styled after Costume Switcher.`;
+        if (rawVersion) {
+            versionEl.dataset.version = rawVersion;
+            versionEl.setAttribute("title", `Outfit Switcher ${versionLabel}`);
+            versionEl.setAttribute("aria-label", `Outfit Switcher ${versionLabel}`);
+        } else {
+            delete versionEl.dataset.version;
+            versionEl.removeAttribute("title");
+            versionEl.removeAttribute("aria-label");
+        }
+
+        const description = typeof manifest?.description === "string" ? manifest.description.trim() : "";
+        if (description) {
+            noteEl.textContent = `${description} Styled after Costume Switcher.`;
         } else {
             noteEl.textContent = fallbackNote;
         }
     } catch (error) {
         console.warn(`${logPrefix} Unable to populate build metadata`, error);
         versionEl.textContent = "Outfit Switcher";
+        delete versionEl.dataset.version;
+        versionEl.removeAttribute("title");
+        versionEl.removeAttribute("aria-label");
         noteEl.textContent = fallbackNote;
     }
 }
@@ -271,21 +397,21 @@ function attachFolderPicker(button, targetInput, { mode = "absolute" } = {}) {
 
 function handleEnableToggle(event) {
     settings.enabled = Boolean(event.target.checked);
-    persistSettings("enabled");
+    scheduleAutoSave({ key: "enabled", element: event.target, announce: false });
     showStatus(settings.enabled ? "Outfit switching enabled." : "Outfit switching disabled.", "info");
 }
 
 function addTriggerRow(trigger = { trigger: "", folder: "" }) {
     const profile = getActiveProfile();
     profile.triggers.push(normalizeTriggerEntry(trigger));
-    persistSettings("triggers");
+    scheduleAutoSave({ key: "triggers", noticeKey: "triggers" });
     renderTriggers();
 }
 
 function removeTriggerRow(index) {
     const profile = getActiveProfile();
     profile.triggers.splice(index, 1);
-    persistSettings("triggers");
+    scheduleAutoSave({ key: "triggers", noticeKey: "triggers" });
     renderTriggers();
 }
 
@@ -327,16 +453,17 @@ function bindTriggerInputs(row, index) {
         const triggers = parseTriggerTextareaValue(event.target.value);
         activeProfile.triggers[index].triggers = triggers;
         activeProfile.triggers[index].trigger = triggers[0] || "";
-        persistSettings("triggers");
+        scheduleAutoSave({ key: "triggers", element: event.target });
     });
 
     folderInput.addEventListener("input", (event) => {
         const activeProfile = getActiveProfile();
         activeProfile.triggers[index].folder = event.target.value;
-        persistSettings("triggers");
+        scheduleAutoSave({ key: "triggers", element: event.target });
     });
 
     runButton.addEventListener("click", async () => {
+        flushAutoSave({ showStatusMessage: false });
         if (!settings.enabled) {
             showStatus("Enable Outfit Switcher to use triggers.", "error");
             return;
@@ -400,7 +527,7 @@ function renderTriggers() {
 function addVariant(variant = { name: "", folder: "" }) {
     const profile = getActiveProfile();
     profile.variants.push(normalizeVariantEntry(variant));
-    persistSettings("variants");
+    scheduleAutoSave({ key: "variants", noticeKey: "variants" });
     renderVariants();
     renderTriggers();
 }
@@ -408,7 +535,7 @@ function addVariant(variant = { name: "", folder: "" }) {
 function removeVariant(index) {
     const profile = getActiveProfile();
     profile.variants.splice(index, 1);
-    persistSettings("variants");
+    scheduleAutoSave({ key: "variants", noticeKey: "variants" });
     renderVariants();
     renderTriggers();
 }
@@ -427,16 +554,17 @@ function bindVariantInputs(row, index) {
     nameInput.addEventListener("input", (event) => {
         const activeProfile = getActiveProfile();
         activeProfile.variants[index].name = event.target.value;
-        persistSettings("variants");
+        scheduleAutoSave({ key: "variants", element: event.target });
     });
 
     folderInput.addEventListener("input", (event) => {
         const activeProfile = getActiveProfile();
         activeProfile.variants[index].folder = event.target.value;
-        persistSettings("variants");
+        scheduleAutoSave({ key: "variants", element: event.target });
     });
 
     runButton.addEventListener("click", async () => {
+        flushAutoSave({ showStatusMessage: false });
         if (!settings.enabled) {
             showStatus("Enable Outfit Switcher to use variants.", "error");
             return;
@@ -497,10 +625,11 @@ function renderVariants() {
 function handleBaseFolderInput(event) {
     const profile = getActiveProfile();
     profile.baseFolder = event.target.value.trim();
-    persistSettings("baseFolder");
+    scheduleAutoSave({ key: "baseFolder", element: event.target });
 }
 
 async function runTriggerByName(triggerName, source = "slash") {
+    flushAutoSave({ showStatusMessage: false });
     if (!settings.enabled) {
         const disabledMessage = "Outfit Switcher is disabled for the focus character.";
         if (source === "slash") {
@@ -554,6 +683,7 @@ function bindUI() {
 
     if (runBaseButton) {
         runBaseButton.addEventListener("click", async () => {
+            flushAutoSave({ showStatusMessage: false });
             if (!settings.enabled) {
                 showStatus("Enable Outfit Switcher to run the base folder.", "error");
                 return;
@@ -597,6 +727,12 @@ async function init() {
 }
 
 initSlashCommand();
+
+if (typeof window !== "undefined") {
+    window.addEventListener("beforeunload", () => {
+        flushAutoSave({ showStatusMessage: false, force: true });
+    });
+}
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
