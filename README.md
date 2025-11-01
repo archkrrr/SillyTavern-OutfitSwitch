@@ -1,10 +1,10 @@
-# Costume Switcher for SillyTavern
+# Outfit Switcher for SillyTavern
 
-Costume Switcher is the companion piece to Lenny’s **Character Expressions** extension—it uses the same foundations, but instead of changing facial expressions it swaps the entire costume or avatar folder the moment a new speaker takes the spotlight. Install both and SillyTavern keeps the correct character in focus *and* their emotions in sync, giving you a live stage crew that reacts faster than you can type.
+Outfit Switcher keeps a single character’s wardrobe perfectly synchronized with the conversation. Set it up once for your lead and every time they speak, the extension swaps in the matching avatar or costume folder so the star of your story always looks the part.
 
-Under the hood the extension listens to streaming output from your model, scores every character mention it finds, and immediately updates the displayed costume to match the active speaker. It ships with powerful tooling, scene awareness, and a fully redesigned configuration UI so you can understand *why* a switch happened and tune the behaviour to fit any story.
+Built on the same detection stack as Lenny’s **Character Expressions** extension, Outfit Switcher narrows the focus to one character at a time. Teach it the names, aliases, and prompts that identify your protagonist and let the automation handle every outfit change while you concentrate on writing.
 
-> **New to Costume Switcher?** Start here, then hop over to the Character Expressions README. Together they form a best-friends duo: Expressions handles nuanced emotions, Costume Switcher handles wardrobe changes.
+> **Using Character Expressions too?** Pair it with Outfit Switcher to give the same hero both wardrobe changes and facial reactions without juggling multiple dashboards.
 
 ---
 
@@ -71,10 +71,10 @@ Under the hood the extension listens to streaming output from your model, scores
 1. Open **Settings → Extensions → Extension Manager** in SillyTavern.
 2. Click **Install from URL** and paste the repository address:
    ```
-   https://github.com/archkrrr/SillyTavern-CostumeSwitch
+   https://github.com/archkrrr/SillyTavern-OutfitSwitch
    ```
 3. Press **Install**. SillyTavern downloads the extension and refreshes the page.
-4. Enable **Costume Switcher** from the Extensions list if it is not activated automatically.
+4. Enable **Outfit Switcher** from the Extensions list if it is not activated automatically.
 
 To update, return to the Extension Manager and click **Update all** or reinstall from the same URL.
 

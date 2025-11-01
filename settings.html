@@ -1,14 +1,14 @@
 <div id="costume-switcher-settings" class="extension_container cs-theme">
   <div class="inline-drawer is-open">
     <div class="inline-drawer-toggle inline-drawer-header">
-      <b>Costume Switcher</b>
+      <b>Outfit Switcher</b>
       <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
     </div>
     <div class="inline-drawer-content">
       <div class="cs-shell">
     <section class="cs-card cs-header-card">
       <div class="cs-header-intro">
-        <h2 class="cs-title">Costume Switcher</h2>
+        <h2 class="cs-title">Outfit Switcher</h2>
       </div>
       <div class="cs-header-meta">
         <div class="cs-build-meta" role="status" aria-live="polite">
@@ -19,8 +19,8 @@
           <input id="cs-enable" type="checkbox" />
           <span class="cs-switch-thumb" aria-hidden="true"></span>
           <div class="cs-switch-copy">
-            <strong>Enable Costume Switching</strong>
-            <small>Master toggle to pause detection without changing your settings.</small>
+            <strong>Enable Outfit Switching</strong>
+            <small>Pause outfit tracking for your focus character without changing your settings.</small>
           </div>
         </label>
       </div>
@@ -33,7 +33,7 @@
       </button>
       <button class="cs-tab-button" id="cs-tab-characters" type="button" role="tab" aria-selected="false" aria-controls="cs-panel-characters" data-tab="characters">
         <i class="fa-solid fa-users"></i>
-        <span>Characters</span>
+        <span>Focus Signals</span>
       </button>
       <button class="cs-tab-button" id="cs-tab-outfits" type="button" role="tab" aria-selected="false" aria-controls="cs-panel-outfits" data-tab="outfits">
         <i class="fa-solid fa-shirt"></i>
@@ -59,7 +59,7 @@
                   <i class="fa-solid fa-address-card"></i>
                   <div>
                     <h3>Profiles</h3>
-                    <p>Organize different configurations for varied chats or characters.</p>
+                    <p>Organize different configurations for stories starring your focus character.</p>
                   </div>
                 </div>
               </header>
@@ -94,7 +94,7 @@
                   <i class="fa-solid fa-wand-magic-sparkles"></i>
                   <div>
                     <h3>Quick Presets</h3>
-                    <p>Apply a curated detector setup to the current profile.</p>
+                    <p>Apply a curated detector setup tuned for your lead’s wardrobe.</p>
                   </div>
                 </div>
               </header>
@@ -103,7 +103,7 @@
                   <select id="cs-preset-select" class="text_pole" style="flex: 1 1 auto;" title="Pick a preset to review its settings before applying."></select>
                   <button id="cs-preset-load" class="menu_button interactable cs-button-primary" title="Apply the selected preset to this profile." data-change-notice="Applying a preset saves your profile immediately.">Apply Preset</button>
                 </div>
-                <p id="cs-preset-description" class="cs-helper-text">Load a recommended configuration into the current profile.</p>
+                <p id="cs-preset-description" class="cs-helper-text">Load a recommended configuration that keeps your star character in frame.</p>
               </div>
             </section>
           </div>
@@ -119,23 +119,23 @@
                   <i class="fa-solid fa-lock"></i>
                   <div>
                     <h3>Manual Overrides</h3>
-                    <p>Lock to a character or pick a fallback costume.</p>
+                    <p>Lock to your focus character or pick a fallback outfit.</p>
                   </div>
                 </div>
               </header>
               <div class="cs-card-body cs-card-body--stacked">
                 <div class="cs-field">
                   <label for="cs-focus-lock-select">Focus Lock</label>
-                  <small>Force the switcher to stay on a specific character until you unlock it.</small>
+                  <small>Force the switcher to stay on your chosen character until you unlock it.</small>
                   <div class="cs-toolbar">
-                    <select id="cs-focus-lock-select" class="text_pole" style="flex: 1 1 auto;" title="Select a character from your patterns to lock onto."></select>
-                    <button id="cs-focus-lock-toggle" class="menu_button interactable" title="Lock or unlock the focus on the selected character." data-change-notice="Focus lock changes save right away.">Lock</button>
+                    <select id="cs-focus-lock-select" class="text_pole" style="flex: 1 1 auto;" title="Select a focus name from your patterns to lock onto."></select>
+                    <button id="cs-focus-lock-toggle" class="menu_button interactable" title="Lock or unlock the focus on the selected name." data-change-notice="Focus lock changes save right away.">Lock</button>
                   </div>
                 </div>
                 <div class="cs-field">
-                  <label for="cs-default">Default Costume</label>
-                  <input id="cs-default" class="text_pole" type="text" placeholder="e.g., neutral" title="The costume folder to use when no character is detected. Leave blank for the main avatar." />
-                  <small>The costume used when no character is detected. Leave blank to fall back to the main avatar.</small>
+                  <label for="cs-default">Default Outfit</label>
+                  <input id="cs-default" class="text_pole" type="text" placeholder="e.g., neutral" title="The outfit folder to use when your focus character is off-screen. Leave blank for the main avatar." />
+                  <small>The outfit used when no match is detected. Leave blank to fall back to the main avatar.</small>
                 </div>
               </div>
             </section>
@@ -146,24 +146,24 @@
                 <div class="cs-card-title">
                   <i class="fa-solid fa-address-card"></i>
                   <div>
-                    <h3>Character Patterns</h3>
-                    <p>Teach the switcher which characters to watch for.</p>
+                    <h3>Focus Patterns</h3>
+                    <p>Teach the switcher how to recognize your spotlight character.</p>
                   </div>
                 </div>
               </header>
               <div class="cs-card-body cs-card-body--stacked">
                 <div class="cs-field">
-                  <label for="cs-patterns">Active Characters</label>
-                  <textarea id="cs-patterns" class="text_pole" rows="3" placeholder="Character One&#10;Character Two&#10;/Regular Expression/" title="Enter character names or /regex/, one per line."></textarea>
+                  <label for="cs-patterns">Focus Names</label>
+                  <textarea id="cs-patterns" class="text_pole" rows="3" placeholder="Protagonist&#10;Lead Alias&#10;/Regular Expression/" title="Enter names or /regex/ that represent your focus character, one per line."></textarea>
                   <small class="cs-tip"><strong>Tip:</strong> List longer names before shorter ones that are part of them (e.g., put “Arthur” before “Art”).</small>
                 </div>
                 <div class="cs-field">
-                  <label for="cs-ignore-patterns">Ignored Characters</label>
-                  <textarea id="cs-ignore-patterns" class="text_pole" rows="2" placeholder="Char A&#10;/Narrator/" title="Any character pattern on this list will be ignored during detection."></textarea>
+                  <label for="cs-ignore-patterns">Ignored Mentions</label>
+                  <textarea id="cs-ignore-patterns" class="text_pole" rows="2" placeholder="Narrator&#10;/Sidekick/" title="Any names or /regex/ here will never trigger a wardrobe swap."></textarea>
                 </div>
                 <div class="cs-field">
                   <label for="cs-veto-patterns">Veto Phrases</label>
-                  <textarea id="cs-veto-patterns" class="text_pole" rows="2" placeholder="OOC:&#10;(OOC)" title="If any of these phrases or /regex/ are found, the entire message will be ignored."></textarea>
+                  <textarea id="cs-veto-patterns" class="text_pole" rows="2" placeholder="OOC:&#10;(OOC)" title="If any of these phrases or /regex/ are found, the entire message will be ignored and no outfit change will occur."></textarea>
                 </div>
               </div>
             </section>
@@ -174,19 +174,19 @@
                 <div class="cs-card-title">
                   <i class="fa-solid fa-layer-group"></i>
                   <div>
-                    <h3>Costume Mappings</h3>
-                    <p>Map detected names to specific costume folders.</p>
+                    <h3>Outfit Mapping</h3>
+                    <p>Map your focus cues to the outfit folders you want to show.</p>
                   </div>
                 </div>
               </header>
               <div class="cs-card-body">
                 <table id="cs-mappings" class="text_pole">
                   <thead>
-                    <tr><th>Character Name</th><th>Costume Folder</th><th>Action</th></tr>
+                    <tr><th>Focus Name or Alias</th><th>Outfit Folder</th><th>Action</th></tr>
                   </thead>
                   <tbody id="cs-mappings-tbody"></tbody>
                 </table>
-                <button id="cs-mapping-add" class="menu_button interactable" style="margin-top: 12px;" data-change-notice="Adding a row will be saved once details are filled in.">Add Mapping</button>
+                <button id="cs-mapping-add" class="menu_button interactable" style="margin-top: 12px;" data-change-notice="Adding a row will be saved once details are filled in.">Add Outfit Mapping</button>
               </div>
             </section>
           </div>
@@ -214,7 +214,7 @@
                       Outfit awareness is an early preview feature. Expect rough edges, limited functionality, and breaking changes as the system evolves.
                     </p>
                     <p class="cs-experiment-subcopy">
-                      Use this lab to stage per-character wardrobes, configure trigger filters, and test scene-aware variants before the feature graduates into the main Characters tab.
+                      Use this lab to stage wardrobe variants for your focus character, configure trigger filters, and test scene-aware options before the feature graduates into the main Focus Signals tab.
                     </p>
                   </div>
                 </div>
@@ -235,12 +235,12 @@
                 </div>
                 <div id="cs-outfit-editor" class="cs-outfit-editor" aria-live="polite" aria-busy="false">
                   <p class="cs-helper-text cs-outfit-editor-intro">
-                    Add characters to prototype nested outfit mappings. Variations can include triggers (one per line, supports <code>/regex/</code>), match-type filters, and scene awareness requirements before falling back to the default folder.
+                    Add outfit variants for your lead. Each variation can include triggers (one per line, supports <code>/regex/</code>), match-type filters, and scene awareness requirements before falling back to the default folder.
                   </p>
-                  <div id="cs-outfit-character-list" class="cs-outfit-character-list" data-empty-text="No characters have outfit variations yet."></div>
-                  <button id="cs-outfit-add-character" class="menu_button interactable cs-outfit-add-button" type="button" data-change-notice="Adds a new character slot and auto-saves your mappings.">
+                  <div id="cs-outfit-character-list" class="cs-outfit-character-list" data-empty-text="No outfit variants have been defined yet."></div>
+                  <button id="cs-outfit-add-character" class="menu_button interactable cs-outfit-add-button" type="button" data-change-notice="Adds a new outfit variant slot and auto-saves your mappings.">
                     <i class="fa-solid fa-user-plus"></i>
-                    <span>Add Character Slot</span>
+                    <span>Add Outfit Variant</span>
                   </button>
                 </div>
               </div>
@@ -476,16 +476,16 @@
                   <h4>Live Tester Walkthrough</h4>
                   <ol>
                     <li>Paste a recent chat message or narration chunk, then run <strong>Test Pattern</strong>.</li>
-                    <li>Check the summary cards to see which characters ranked highest and whether a switch fired.</li>
+                    <li>Check the summary cards to confirm your focus cues ranked highest and whether a switch fired.</li>
                     <li>Drill into the panels below to inspect detections, winners, roster health, and vocabulary tips.</li>
                   </ol>
                 </div>
                 <div id="cs-regex-test-output-container" class="text_pole cs-tester-output-container">
                   <div class="cs-tester-summary-grid">
                     <div class="cs-summary-card">
-                      <span class="cs-summary-label">Top Characters</span>
+                      <span class="cs-summary-label">Top Focus Matches</span>
                       <div id="cs-test-top-characters" class="cs-summary-value cs-tester-list-placeholder">N/A</div>
-                      <p>Highest scoring matches from the last run.</p>
+                      <p>Highest scoring mentions tied to your wardrobe focus.</p>
                     </div>
                     <div class="cs-summary-card">
                       <span class="cs-summary-label">Veto Status</span>
@@ -494,14 +494,14 @@
                     </div>
                     <div class="cs-summary-card">
                       <span class="cs-summary-label">Quick Tip</span>
-                      <p class="cs-summary-help">Use the score, roster, and coverage panes below to focus your next tweaks.</p>
+                      <p class="cs-summary-help">Use the score, roster, and coverage panes below to fine-tune how your lead is detected.</p>
                     </div>
                   </div>
                   <div class="cs-tester-panels">
                     <section class="cs-tester-panel cs-tester-panel--flow">
                       <header class="cs-tester-panel-header">
                         <h4>Match Flow</h4>
-                        <p>Follow detections through to the costume decision.</p>
+                        <p>Follow detections through to the outfit decision.</p>
                       </header>
                       <div class="cs-tester-split">
                         <div class="cs-tester-pane">
@@ -513,7 +513,7 @@
                         </div>
                         <div class="cs-tester-pane">
                           <div class="cs-tester-title">Live Switch Decisions</div>
-                          <p class="cs-helper-text">Who would have received the costume change.</p>
+                          <p class="cs-helper-text">Who would have received the outfit change.</p>
                           <ul id="cs-test-winner-list" class="cs-tester-list">
                             <li class="cs-tester-list-placeholder">Stream results will appear here.</li>
                           </ul>
@@ -591,7 +591,7 @@
       <div class="cs-footer">
         <div class="cs-toolbar cs-toolbar--wrap">
           <button id="cs-save" class="menu_button interactable cs-button-primary" data-change-notice="Manual save snapshots the latest auto-saved settings.">Save Current Profile</button>
-          <button id="cs-reset" class="menu_button interactable" title="Switch back to your default costume, or the main avatar if none is set." data-change-notice="Resets your costume immediately.">Manual Reset</button>
+          <button id="cs-reset" class="menu_button interactable" title="Switch back to your default outfit, or the main avatar if none is set." data-change-notice="Resets your outfit immediately.">Manual Reset</button>
         </div>
         <div id="cs-status" class="cs-status-message" aria-live="polite">
           <i class="fa-solid fa-circle-info"></i>
