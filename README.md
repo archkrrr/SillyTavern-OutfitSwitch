@@ -6,7 +6,7 @@ Outfit Switcher is a companion piece to Lenny’s **Character Expressions** exte
 
 Under the hood both extensions listen to streaming output, score the mentions they care about, and update costumes instantly. Costume Switcher layers scene awareness, focus locks, and outfit variants on top, while Outfit Switcher keeps those smarts targeted at a single pipeline. The shared lineage means tips from the Outfit Lab directly improve your Outfit Switcher setup and vice versa.
 
-> **New to the Switcher family?** Start with **Costume Switcher** → enable **Outfit Lab** for single-character wardrobe control → consult the Character Expressions README for emotion swaps. Return here only if you need the archival Outfit Switcher drawer or a minimal install.
+> **New to the Switcher family?** Start here, then hop over to the Character Expressions README. Together they form a best-friends duo: Expressions handles nuanced emotions, Costume Switcher handles wardrobe changes.
 
 
 ## Contents
