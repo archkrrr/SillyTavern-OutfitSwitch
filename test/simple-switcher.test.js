@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+    SCHEMA_VERSION,
     composeCostumePath,
     defaultSettings,
     ensureSettingsShape,
@@ -13,6 +14,23 @@ import {
 test("default settings shape", () => {
     const result = ensureSettingsShape();
     assert.deepEqual(result, defaultSettings);
+});
+
+test("ensure settings shape nests legacy fields into profile", () => {
+    const result = ensureSettingsShape({
+        enabled: true,
+        baseFolder: "Hero ",
+        character: "  Alice  ",
+        variants: [{ name: "  Casual  ", folder: "  casual  " }],
+        triggers: [{ trigger: "  Battle  ", folder: "  armor  " }],
+    });
+
+    assert.equal(result.enabled, true);
+    assert.equal(result.version, SCHEMA_VERSION);
+    assert.equal(result.profile.character, "Alice");
+    assert.equal(result.profile.baseFolder, "Hero");
+    assert.deepEqual(result.profile.variants, [{ name: "Casual", folder: "casual" }]);
+    assert.deepEqual(result.profile.triggers, [{ trigger: "Battle", folder: "armor" }]);
 });
 
 test("normalize trigger entry trims values and supports legacy costume", () => {
@@ -51,4 +69,17 @@ test("find costume for trigger is case-insensitive and respects base folder", ()
     assert.equal(findCostumeForTrigger(settings, "battle"), "hero/armor");
     assert.equal(findCostumeForTrigger(settings, "RELAX"), "hero/casual");
     assert.equal(findCostumeForTrigger(settings, "unknown"), "");
+});
+
+test("find costume for trigger works when provided a profile object", () => {
+    const settings = ensureSettingsShape({
+        profile: {
+            baseFolder: "hero",
+            triggers: [
+                { trigger: "Battle", folder: "armor" },
+            ],
+        },
+    });
+
+    assert.equal(findCostumeForTrigger(settings.profile, "Battle"), "hero/armor");
 });

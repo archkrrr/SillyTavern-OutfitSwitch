@@ -19,6 +19,13 @@ let statusTimer = null;
 
 extension_settings[extensionName] = settings;
 
+function getActiveProfile() {
+    if (!settings.profile || typeof settings.profile !== "object") {
+        settings.profile = ensureSettingsShape().profile;
+    }
+    return settings.profile;
+}
+
 function cloneSettings(value) {
     if (typeof structuredClone === "function") {
         return structuredClone(value);
@@ -105,13 +112,15 @@ function handleEnableToggle(event) {
 }
 
 function addTriggerRow(trigger = { trigger: "", folder: "" }) {
-    settings.triggers.push(normalizeTriggerEntry(trigger));
+    const profile = getActiveProfile();
+    profile.triggers.push(normalizeTriggerEntry(trigger));
     persistSettings("triggers");
     renderTriggers();
 }
 
 function removeTriggerRow(index) {
-    settings.triggers.splice(index, 1);
+    const profile = getActiveProfile();
+    profile.triggers.splice(index, 1);
     persistSettings("triggers");
     renderTriggers();
 }
@@ -122,16 +131,19 @@ function bindTriggerInputs(row, index) {
     const runButton = row.querySelector(".cs-trigger-run");
     const deleteButton = row.querySelector(".cs-trigger-delete");
 
-    triggerInput.value = settings.triggers[index].trigger;
-    folderInput.value = settings.triggers[index].folder;
+    const profile = getActiveProfile();
+    triggerInput.value = profile.triggers[index].trigger;
+    folderInput.value = profile.triggers[index].folder;
 
     triggerInput.addEventListener("input", (event) => {
-        settings.triggers[index].trigger = event.target.value;
+        const activeProfile = getActiveProfile();
+        activeProfile.triggers[index].trigger = event.target.value;
         persistSettings("triggers");
     });
 
     folderInput.addEventListener("input", (event) => {
-        settings.triggers[index].folder = event.target.value;
+        const activeProfile = getActiveProfile();
+        activeProfile.triggers[index].folder = event.target.value;
         persistSettings("triggers");
     });
 
@@ -140,7 +152,8 @@ function bindTriggerInputs(row, index) {
             showStatus("Enable Outfit Switcher to use triggers.", "error");
             return;
         }
-        const targetFolder = composeCostumePath(settings.baseFolder, settings.triggers[index].folder);
+        const activeProfile = getActiveProfile();
+        const targetFolder = composeCostumePath(activeProfile.baseFolder, activeProfile.triggers[index].folder);
         const result = await issueCostume(targetFolder, { source: "ui" });
         if (result.toLowerCase().startsWith("please provide")) {
             showStatus("Enter an outfit folder before running the trigger.", "error");
@@ -159,7 +172,9 @@ function renderTriggers() {
     }
 
     tbody.innerHTML = "";
-    settings.triggers.forEach((trigger, index) => {
+    const profile = getActiveProfile();
+
+    profile.triggers.forEach((trigger, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="text_pole cs-trigger-input" placeholder="Trigger" /></td>
@@ -173,7 +188,7 @@ function renderTriggers() {
         bindTriggerInputs(row, index);
     });
 
-    if (!settings.triggers.length) {
+    if (!profile.triggers.length) {
         const emptyRow = document.createElement("tr");
         emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No triggers yet. Add one below.</td>`;
         tbody.appendChild(emptyRow);
@@ -181,14 +196,16 @@ function renderTriggers() {
 }
 
 function addVariant(variant = { name: "", folder: "" }) {
-    settings.variants.push(normalizeVariantEntry(variant));
+    const profile = getActiveProfile();
+    profile.variants.push(normalizeVariantEntry(variant));
     persistSettings("variants");
     renderVariants();
     renderTriggers();
 }
 
 function removeVariant(index) {
-    settings.variants.splice(index, 1);
+    const profile = getActiveProfile();
+    profile.variants.splice(index, 1);
     persistSettings("variants");
     renderVariants();
     renderTriggers();
@@ -200,16 +217,19 @@ function bindVariantInputs(row, index) {
     const runButton = row.querySelector(".cs-variant-run");
     const deleteButton = row.querySelector(".cs-variant-delete");
 
-    nameInput.value = settings.variants[index].name;
-    folderInput.value = settings.variants[index].folder;
+    const profile = getActiveProfile();
+    nameInput.value = profile.variants[index].name;
+    folderInput.value = profile.variants[index].folder;
 
     nameInput.addEventListener("input", (event) => {
-        settings.variants[index].name = event.target.value;
+        const activeProfile = getActiveProfile();
+        activeProfile.variants[index].name = event.target.value;
         persistSettings("variants");
     });
 
     folderInput.addEventListener("input", (event) => {
-        settings.variants[index].folder = event.target.value;
+        const activeProfile = getActiveProfile();
+        activeProfile.variants[index].folder = event.target.value;
         persistSettings("variants");
     });
 
@@ -218,7 +238,8 @@ function bindVariantInputs(row, index) {
             showStatus("Enable Outfit Switcher to use variants.", "error");
             return;
         }
-        const targetFolder = composeCostumePath(settings.baseFolder, settings.variants[index].folder);
+        const activeProfile = getActiveProfile();
+        const targetFolder = composeCostumePath(activeProfile.baseFolder, activeProfile.variants[index].folder);
         const result = await issueCostume(targetFolder, { source: "ui" });
         if (result.toLowerCase().startsWith("please provide")) {
             showStatus("Set the base folder or variant folder before running.", "error");
@@ -237,7 +258,9 @@ function renderVariants() {
     }
 
     tbody.innerHTML = "";
-    settings.variants.forEach((variant, index) => {
+    const profile = getActiveProfile();
+
+    profile.variants.forEach((variant, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="text_pole cs-variant-name" placeholder="Variant name" /></td>
@@ -251,7 +274,7 @@ function renderVariants() {
         bindVariantInputs(row, index);
     });
 
-    if (!settings.variants.length) {
+    if (!profile.variants.length) {
         const emptyRow = document.createElement("tr");
         emptyRow.innerHTML = `<td colspan="3" class="cs-empty">No variants configured. Add one below.</td>`;
         tbody.appendChild(emptyRow);
@@ -259,7 +282,8 @@ function renderVariants() {
 }
 
 function handleBaseFolderInput(event) {
-    settings.baseFolder = event.target.value.trim();
+    const profile = getActiveProfile();
+    profile.baseFolder = event.target.value.trim();
     persistSettings("baseFolder");
 }
 
@@ -299,7 +323,8 @@ function bindUI() {
     }
 
     if (baseFolderInput) {
-        baseFolderInput.value = settings.baseFolder;
+        const profile = getActiveProfile();
+        baseFolderInput.value = profile.baseFolder;
         baseFolderInput.addEventListener("input", handleBaseFolderInput);
     }
 
@@ -317,11 +342,12 @@ function bindUI() {
                 showStatus("Enable Outfit Switcher to run the base folder.", "error");
                 return;
             }
-            if (!settings.baseFolder) {
+            const profile = getActiveProfile();
+            if (!profile.baseFolder) {
                 showStatus("Set a base folder before running it.", "error");
                 return;
             }
-            await issueCostume(settings.baseFolder, { source: "ui" });
+            await issueCostume(profile.baseFolder, { source: "ui" });
         });
     }
 
