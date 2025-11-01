@@ -957,8 +957,8 @@ async function ensureSettingsPanel() {
 }
 
 function showStatus(message, type = "info", duration = 2500) {
-    const statusEl = getElement("#cs-status");
-    const textEl = getElement("#cs-status-text");
+    const statusEl = getElement("#os-status");
+    const textEl = getElement("#os-status-text");
     if (!statusEl || !textEl) {
         console.log(`${logPrefix} ${message}`);
         return;
@@ -983,8 +983,8 @@ async function populateBuildMeta() {
     let noteEl;
     try {
         [versionEl, noteEl] = await Promise.all([
-            waitForElement("#cs-build-version"),
-            waitForElement("#cs-build-note"),
+            waitForElement("#os-build-version"),
+            waitForElement("#os-build-note"),
         ]);
     } catch (error) {
         console.warn(`${logPrefix} Unable to resolve build metadata elements`, error);
@@ -1248,7 +1248,7 @@ function bindTriggerInputs(row, index) {
 }
 
 function renderTriggers() {
-    const tbody = getElement("#cs-trigger-table-body");
+    const tbody = getElement("#os-trigger-table-body");
     if (!tbody) {
         return;
     }
@@ -1349,7 +1349,7 @@ function bindVariantInputs(row, index) {
 }
 
 function renderVariants() {
-    const tbody = getElement("#cs-variant-table-body");
+    const tbody = getElement("#os-variant-table-body");
     if (!tbody) {
         return;
     }
@@ -1418,21 +1418,21 @@ async function runTriggerByName(triggerName, source = "slash") {
 }
 
 function bindUI() {
-    const enableCheckbox = getElement("#cs-enable");
-    const baseFolderInput = getElement("#cs-base-folder");
-    const baseFolderButton = getElement("#cs-base-folder-select");
-    const addVariantButton = getElement("#cs-add-variant");
-    const addTriggerButton = getElement("#cs-add-trigger");
-    const runBaseButton = getElement("#cs-run-base");
-    uiState.profileSelect = getElement("#cs-profile-select");
-    uiState.profilePill = getElement("#cs-profile-pill");
-    uiState.profileCreateButton = getElement("#cs-profile-create");
-    uiState.profileDuplicateButton = getElement("#cs-profile-duplicate");
-    uiState.profileRenameButton = getElement("#cs-profile-rename");
-    uiState.profileDeleteButton = getElement("#cs-profile-delete");
-    uiState.profileExportButton = getElement("#cs-profile-export");
-    uiState.profileImportButton = getElement("#cs-profile-import");
-    uiState.profileImportInput = getElement("#cs-profile-import-file");
+    const enableCheckbox = getElement("#os-enable");
+    const baseFolderInput = getElement("#os-base-folder");
+    const baseFolderButton = getElement("#os-base-folder-select");
+    const addVariantButton = getElement("#os-add-variant");
+    const addTriggerButton = getElement("#os-add-trigger");
+    const runBaseButton = getElement("#os-run-base");
+    uiState.profileSelect = getElement("#os-profile-select");
+    uiState.profilePill = getElement("#os-profile-pill");
+    uiState.profileCreateButton = getElement("#os-profile-create");
+    uiState.profileDuplicateButton = getElement("#os-profile-duplicate");
+    uiState.profileRenameButton = getElement("#os-profile-rename");
+    uiState.profileDeleteButton = getElement("#os-profile-delete");
+    uiState.profileExportButton = getElement("#os-profile-export");
+    uiState.profileImportButton = getElement("#os-profile-import");
+    uiState.profileImportInput = getElement("#os-profile-import-file");
 
     if (enableCheckbox) {
         enableCheckbox.checked = settings.enabled;

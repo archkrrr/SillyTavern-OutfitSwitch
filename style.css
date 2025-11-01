@@ -318,8 +318,9 @@
 
 #outfit-switcher-settings.cs-theme .cs-toolbar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
+    width: 100%;
 }
 
 #outfit-switcher-settings.cs-theme .cs-toolbar--wrap {
@@ -334,16 +335,18 @@
 }
 
 #outfit-switcher-settings.cs-theme .cs-profile-card {
-    background: linear-gradient(145deg, rgba(108, 92, 231, 0.22), rgba(46, 213, 115, 0.12));
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
+    background: color-mix(in srgb, var(--surface) 94%, rgba(255, 255, 255, 0.06));
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: var(--card-shadow-soft);
 }
 
 #outfit-switcher-settings.cs-theme .cs-profile-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 10px;
     flex-wrap: wrap;
+    flex: 1 1 240px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-profile-pill {

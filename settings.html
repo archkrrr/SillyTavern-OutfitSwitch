@@ -13,19 +13,19 @@
                     </div>
                     <div class="cs-header-meta">
                         <div class="cs-build-meta" role="status" aria-live="polite">
-                            <span class="cs-build-pill" id="cs-build-version">Loading…</span>
-                            <span class="cs-build-note" id="cs-build-note">Checking extension details…</span>
+                            <span class="cs-build-pill" id="os-build-version">Loading…</span>
+                            <span class="cs-build-note" id="os-build-note">Checking extension details…</span>
                         </div>
                         <div class="cs-header-controls">
                             <label class="cs-master-toggle">
-                                <input id="cs-enable" type="checkbox" />
+                                <input id="os-enable" type="checkbox" />
                                 <span class="cs-switch-thumb" aria-hidden="true"></span>
                                 <div class="cs-switch-copy">
                                     <strong>Enable Outfit Switching</strong>
                                     <small>Pause outfit updates without clearing your configured folders.</small>
                                 </div>
                             </label>
-                            <button id="cs-run-base" class="menu_button interactable cs-button-primary" type="button" title="Run the base folder immediately">
+                            <button id="os-run-base" class="menu_button interactable cs-button-primary" type="button" title="Run the base folder immediately">
                                 <i class="fa-solid fa-play"></i>
                                 <span>Run Base Outfit</span>
                             </button>
@@ -42,43 +42,43 @@
                                 <p>Save multiple outfit presets for the same focus character.</p>
                             </div>
                         </div>
-                        <span id="cs-profile-pill" class="cs-profile-pill" role="status" aria-live="polite">Active: <strong>Default</strong></span>
+                        <span id="os-profile-pill" class="cs-profile-pill" role="status" aria-live="polite">Active: <strong>Default</strong></span>
                     </header>
                     <div class="cs-card-body cs-card-body--stacked">
                         <div class="cs-toolbar cs-toolbar--wrap">
                             <label class="cs-field cs-field-inline">
                                 <span>Active Profile</span>
-                                <select id="cs-profile-select" class="text_pole" title="Choose a saved profile"></select>
+                                <select id="os-profile-select" class="text_pole" title="Choose a saved profile"></select>
                             </label>
                             <div class="cs-profile-actions">
-                                <button id="cs-profile-create" class="menu_button interactable cs-button-ghost" type="button" title="Create a fresh profile from defaults">
+                                <button id="os-profile-create" class="menu_button interactable cs-button-ghost" type="button" title="Create a fresh profile from defaults">
                                     <i class="fa-solid fa-plus"></i>
                                     <span>New</span>
                                 </button>
-                                <button id="cs-profile-duplicate" class="menu_button interactable cs-button-ghost" type="button" title="Duplicate the active profile">
+                                <button id="os-profile-duplicate" class="menu_button interactable cs-button-ghost" type="button" title="Duplicate the active profile">
                                     <i class="fa-solid fa-copy"></i>
                                     <span>Duplicate</span>
                                 </button>
-                                <button id="cs-profile-rename" class="menu_button interactable cs-button-ghost" type="button" title="Rename the active profile">
+                                <button id="os-profile-rename" class="menu_button interactable cs-button-ghost" type="button" title="Rename the active profile">
                                     <i class="fa-solid fa-pen"></i>
                                     <span>Rename</span>
                                 </button>
-                                <button id="cs-profile-delete" class="menu_button interactable cs-button-danger" type="button" title="Delete the active profile">
+                                <button id="os-profile-delete" class="menu_button interactable cs-button-danger" type="button" title="Delete the active profile">
                                     <i class="fa-solid fa-trash"></i>
                                     <span>Delete</span>
                                 </button>
                             </div>
                         </div>
                         <div class="cs-toolbar cs-toolbar--wrap">
-                            <button id="cs-profile-export" class="menu_button interactable" type="button" title="Export the active profile to a JSON file">
+                            <button id="os-profile-export" class="menu_button interactable" type="button" title="Export the active profile to a JSON file">
                                 <i class="fa-solid fa-file-arrow-down"></i>
                                 <span>Export</span>
                             </button>
-                            <button id="cs-profile-import" class="menu_button interactable" type="button" title="Import a profile from a JSON file">
+                            <button id="os-profile-import" class="menu_button interactable" type="button" title="Import a profile from a JSON file">
                                 <i class="fa-solid fa-file-arrow-up"></i>
                                 <span>Import</span>
                             </button>
-                            <input id="cs-profile-import-file" type="file" accept=".json" hidden />
+                            <input id="os-profile-import-file" type="file" accept=".json" hidden />
                         </div>
                         <p class="cs-helper-text">Profiles capture the base folder, variants, and triggers so you can hop between arcs or timelines without rebuilding your shortcuts.</p>
                     </div>
@@ -100,8 +100,8 @@
                                 <label class="cs-field">
                                     <span>Base Character Folder</span>
                                     <div class="cs-folder-picker">
-                                        <input id="cs-base-folder" class="text_pole" type="text" placeholder="Character folder" />
-                                        <button id="cs-base-folder-select" class="menu_button interactable cs-button-ghost cs-folder-button" type="button" title="Browse to your focus character's folder">
+                                        <input id="os-base-folder" class="text_pole" type="text" placeholder="Character folder" />
+                                        <button id="os-base-folder-select" class="menu_button interactable cs-button-ghost cs-folder-button" type="button" title="Browse to your focus character's folder">
                                             <i class="fa-solid fa-folder-open"></i>
                                             <span>Pick Folder</span>
                                         </button>
@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
                                 <div class="cs-card-actions">
-                                    <button id="cs-add-variant" class="menu_button interactable cs-button-ghost" type="button" title="Add a new outfit row">
+                                    <button id="os-add-variant" class="menu_button interactable cs-button-ghost" type="button" title="Add a new outfit row">
                                         <i class="fa-solid fa-plus"></i>
                                         <span>Add Variant</span>
                                     </button>
@@ -138,7 +138,7 @@
                                                 <th scope="col">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="cs-variant-table-body"></tbody>
+                                        <tbody id="os-variant-table-body"></tbody>
                                     </table>
                                 </div>
                                 <p class="cs-helper-text">Subfolders can be relative (e.g., <code>formal</code>) or nested (e.g., <code>event/winter</code>).</p>
@@ -208,7 +208,7 @@
                                     </div>
                                 </div>
                                 <div class="cs-card-actions">
-                                    <button id="cs-add-trigger" class="menu_button interactable cs-button-ghost" type="button" title="Add a new trigger row">
+                                    <button id="os-add-trigger" class="menu_button interactable cs-button-ghost" type="button" title="Add a new trigger row">
                                         <i class="fa-solid fa-plus"></i>
                                         <span>Add Trigger</span>
                                     </button>
@@ -225,7 +225,7 @@
                                                 <th scope="col">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="cs-trigger-table-body"></tbody>
+                                        <tbody id="os-trigger-table-body"></tbody>
                                     </table>
                                 </div>
                                 <p class="cs-helper-text">Examples: <code>winter</code>, <code>combat</code>, or even <code>/regex/</code> patterns.</p>
@@ -234,9 +234,9 @@
                     </div>
                 </div>
 
-                <div id="cs-status" class="cs-status" role="status" aria-live="polite">
+                <div id="os-status" class="cs-status" role="status" aria-live="polite">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    <span id="cs-status-text" class="cs-status-text">Ready</span>
+                    <span id="os-status-text" class="cs-status-text">Ready</span>
                 </div>
             </div>
         </div>
