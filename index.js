@@ -12,8 +12,8 @@ import {
 } from "./src/simple-switcher.js";
 import { getOutfitSlashCommandConfig } from "./src/verbs.js";
 
-const extensionName = "SillyTavern-CostumeSwitch";
-const logPrefix = "[CostumeSwitch]";
+const extensionName = "SillyTavern-OutfitSwitch";
+const logPrefix = "[OutfitSwitch]";
 
 let settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
 let statusTimer = null;
@@ -54,7 +54,7 @@ function getSettingsContainer() {
 }
 
 async function ensureSettingsPanel() {
-    if (document.getElementById("costume-switcher-settings")) {
+    if (document.getElementById("outfit-switcher-settings")) {
         return;
     }
 
