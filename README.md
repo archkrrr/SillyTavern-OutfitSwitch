@@ -10,7 +10,6 @@ Under the hood both extensions listen to streaming output, score the mentions th
 
 > **New to the Switcher family?** Start with **Costume Switcher** → enable **Outfit Lab** for single-character wardrobe control → consult the Character Expressions README for emotion swaps. Return here only if you need the archival Outfit Switcher drawer or a minimal install.
 
----
 
 ## Contents
 
