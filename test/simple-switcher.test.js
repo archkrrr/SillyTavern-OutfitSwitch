@@ -19,6 +19,22 @@ test("default settings shape", () => {
     assert.deepEqual(result, defaultSettings);
 });
 
+test("ensure settings shape preserves provided profiles and active profile", () => {
+    const result = ensureSettingsShape({
+        enabled: false,
+        activeProfile: "Alt",
+        profiles: {
+            Default: { baseFolder: "hero" },
+            Alt: { baseFolder: "villain" },
+        },
+    });
+
+    assert.equal(result.enabled, false);
+    assert.equal(result.activeProfile, "Alt");
+    assert.equal(result.profiles.Alt.baseFolder, "villain");
+    assert.equal(result.profiles.Default.baseFolder, "hero");
+});
+
 test("ensure settings shape nests legacy fields into profile", () => {
     const result = ensureSettingsShape({
         enabled: true,
@@ -30,12 +46,15 @@ test("ensure settings shape nests legacy fields into profile", () => {
 
     assert.equal(result.enabled, true);
     assert.equal(result.version, SCHEMA_VERSION);
-    assert.equal(result.profile.baseFolder, "Hero");
-    assert.deepEqual(result.profile.variants, [{ name: "Casual", folder: "casual" }]);
-    assert.deepEqual(result.profile.triggers, [
+    assert.equal(result.activeProfile, "Default");
+    assert.deepEqual(Object.keys(result.profiles), ["Default"]);
+    const activeProfile = result.profiles[result.activeProfile];
+    assert.equal(activeProfile.baseFolder, "Hero");
+    assert.deepEqual(activeProfile.variants, [{ name: "Casual", folder: "casual" }]);
+    assert.deepEqual(activeProfile.triggers, [
         { trigger: "Battle", triggers: ["Battle"], folder: "armor" },
     ]);
-    assert.equal("character" in result.profile, false);
+    assert.equal("character" in activeProfile, false);
 });
 
 test("normalize trigger entry trims values and supports legacy costume", () => {
@@ -130,7 +149,8 @@ test("find costume for trigger works when provided a profile object", () => {
         },
     });
 
-    assert.equal(findCostumeForTrigger(settings.profile, "Battle"), "hero/armor");
+    const profile = settings.profiles[settings.activeProfile];
+    assert.equal(findCostumeForTrigger(profile, "Battle"), "hero/armor");
 });
 
 test("find costume for text matches literals case-insensitively", () => {
@@ -145,7 +165,8 @@ test("find costume for text matches literals case-insensitively", () => {
     const battleMatch = findCostumeForText(settings, "Time to battle the villain!");
     assert.deepEqual(battleMatch, { costume: "hero/armor", trigger: "Battle", type: "literal" });
 
-    const relaxMatch = findCostumeForText(settings.profile, "Let's WIND DOWN after the fight.");
+    const profile = settings.profiles[settings.activeProfile];
+    const relaxMatch = findCostumeForText(profile, "Let's WIND DOWN after the fight.");
     assert.deepEqual(relaxMatch, { costume: "hero/casual", trigger: "wind down", type: "literal" });
 });
 

@@ -1,4 +1,5 @@
 import {
+    DEFAULT_PROFILE_NAME,
     SCHEMA_VERSION,
     composeCostumePath,
     defaultProfile,
@@ -6,6 +7,7 @@ import {
     ensureProfileShape,
     ensureSettingsShape,
     findCostumeForTrigger,
+    resolveProfile,
     normalizeCostumeFolder,
     normalizeTriggerEntry,
     normalizeVariantEntry,
@@ -75,7 +77,7 @@ function collectTriggerPatterns(entry) {
 }
 
 export function findCostumeForText(settingsOrProfile, text) {
-    const profile = settingsOrProfile?.profile ? settingsOrProfile.profile : settingsOrProfile;
+    const profile = resolveProfile(settingsOrProfile);
     if (!profile || typeof text !== "string") {
         return null;
     }
@@ -116,6 +118,7 @@ export function findCostumeForText(settingsOrProfile, text) {
 }
 
 export {
+    DEFAULT_PROFILE_NAME,
     SCHEMA_VERSION,
     composeCostumePath,
     defaultProfile,
@@ -123,6 +126,7 @@ export {
     ensureProfileShape,
     ensureSettingsShape,
     findCostumeForTrigger,
+    resolveProfile,
     normalizeCostumeFolder,
     normalizeTriggerEntry,
     normalizeVariantEntry,

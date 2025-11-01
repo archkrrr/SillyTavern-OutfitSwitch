@@ -305,6 +305,83 @@
     gap: 6px;
 }
 
+#outfit-switcher-settings.cs-theme .cs-field-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 200px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-field-inline span {
+    font-weight: 600;
+}
+
+#outfit-switcher-settings.cs-theme .cs-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-toolbar--wrap {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+#outfit-switcher-settings.cs-theme .cs-toolbar .text_pole,
+#outfit-switcher-settings.cs-theme .cs-toolbar select.text_pole {
+    flex: 1 1 180px;
+    min-width: 0;
+}
+
+#outfit-switcher-settings.cs-theme .cs-profile-card {
+    background: linear-gradient(145deg, rgba(108, 92, 231, 0.22), rgba(46, 213, 115, 0.12));
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
+}
+
+#outfit-switcher-settings.cs-theme .cs-profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#outfit-switcher-settings.cs-theme .cs-profile-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.85rem;
+    color: var(--header-text);
+    white-space: nowrap;
+}
+
+#outfit-switcher-settings.cs-theme .cs-profile-pill-folder {
+    color: var(--text-subtle);
+    font-weight: 500;
+}
+
+#outfit-switcher-settings.cs-theme .cs-button-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    background: color-mix(in srgb, var(--danger) 82%, rgba(0, 0, 0, 0.2));
+    border: 1px solid color-mix(in srgb, var(--danger) 70%, transparent);
+    color: #fff;
+    transition: background 140ms ease, transform 140ms ease;
+}
+
+#outfit-switcher-settings.cs-theme .cs-button-danger:hover {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--danger) 88%, #ffffff 12%);
+}
+
 #outfit-switcher-settings.cs-theme .cs-folder-picker {
     display: flex;
     align-items: center;

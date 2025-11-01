@@ -1,4 +1,6 @@
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
+
+export const DEFAULT_PROFILE_NAME = "Default";
 
 function gatherTriggerStrings(value) {
     const results = [];
@@ -91,8 +93,27 @@ export function ensureProfileShape(rawProfile = {}) {
 
 export const defaultProfile = ensureProfileShape();
 
-export function ensureSettingsShape(raw = {}) {
-    const enabled = Boolean(raw?.enabled);
+function normalizeProfilesMap(rawProfiles = {}) {
+    const normalized = {};
+    if (!rawProfiles || typeof rawProfiles !== "object") {
+        return normalized;
+    }
+
+    for (const [name, profile] of Object.entries(rawProfiles)) {
+        if (typeof name !== "string" || !name.trim()) {
+            continue;
+        }
+        normalized[name.trim()] = ensureProfileShape(profile);
+    }
+
+    return normalized;
+}
+
+function coerceLegacyProfile(raw = {}) {
+    if (!raw || typeof raw !== "object") {
+        return ensureProfileShape();
+    }
+
     const detectedProfile = raw?.profile && typeof raw.profile === "object"
         ? raw.profile
         : {
@@ -101,10 +122,31 @@ export function ensureSettingsShape(raw = {}) {
               triggers: raw?.triggers,
           };
 
-    const profile = ensureProfileShape(detectedProfile);
+    return ensureProfileShape(detectedProfile);
+}
+
+export function ensureSettingsShape(raw = {}) {
+    const enabled = Boolean(raw?.enabled);
     const version = Number.isInteger(raw?.version) && raw.version > 0 ? raw.version : SCHEMA_VERSION;
 
-    return { version: Math.max(version, SCHEMA_VERSION), enabled, profile };
+    let profiles = normalizeProfilesMap(raw?.profiles);
+
+    if (!Object.keys(profiles).length) {
+        const legacyProfile = coerceLegacyProfile(raw);
+        profiles = { [DEFAULT_PROFILE_NAME]: legacyProfile };
+    }
+
+    let activeProfile = typeof raw?.activeProfile === "string" ? raw.activeProfile.trim() : "";
+    if (!activeProfile || !profiles[activeProfile]) {
+        activeProfile = Object.keys(profiles)[0] || DEFAULT_PROFILE_NAME;
+    }
+
+    return {
+        version: Math.max(version, SCHEMA_VERSION),
+        enabled,
+        profiles,
+        activeProfile,
+    };
 }
 
 export const defaultSettings = ensureSettingsShape();
@@ -130,8 +172,37 @@ export function composeCostumePath(baseFolder = "", variantFolder = "") {
     return variant || base;
 }
 
+export function resolveProfile(settingsOrProfile) {
+    if (!settingsOrProfile || typeof settingsOrProfile !== "object") {
+        return null;
+    }
+
+    if (settingsOrProfile?.profile && typeof settingsOrProfile.profile === "object") {
+        return settingsOrProfile.profile;
+    }
+
+    if (settingsOrProfile?.profiles && typeof settingsOrProfile.profiles === "object") {
+        const activeName = typeof settingsOrProfile.activeProfile === "string"
+            ? settingsOrProfile.activeProfile.trim()
+            : "";
+
+        if (activeName && settingsOrProfile.profiles[activeName]) {
+            return settingsOrProfile.profiles[activeName];
+        }
+
+        const fallbackName = Object.keys(settingsOrProfile.profiles)[0];
+        if (fallbackName) {
+            return settingsOrProfile.profiles[fallbackName];
+        }
+
+        return null;
+    }
+
+    return settingsOrProfile;
+}
+
 export function findCostumeForTrigger(settingsOrProfile, key) {
-    const profile = settingsOrProfile?.profile ? settingsOrProfile.profile : settingsOrProfile;
+    const profile = resolveProfile(settingsOrProfile);
     if (!profile || !Array.isArray(profile.triggers)) {
         return "";
     }

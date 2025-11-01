@@ -2,7 +2,9 @@ import { extension_settings } from "../../../extensions.js";
 import { saveSettingsDebounced, event_types, eventSource } from "../../../../script.js";
 import { executeSlashCommandsOnChatInput, registerSlashCommand } from "../../../slash-commands.js";
 import {
+    DEFAULT_PROFILE_NAME,
     defaultSettings,
+    ensureProfileShape,
     ensureSettingsShape,
     findCostumeForTrigger,
     findCostumeForText,
@@ -40,6 +42,8 @@ const AUTO_SAVE_REASON_OVERRIDES = {
     baseFolder: "the base folder",
     variants: "your variants",
     triggers: "your triggers",
+    profiles: "your profiles",
+    activeProfile: "the active profile",
 };
 
 const autoSaveState = {
@@ -50,11 +54,363 @@ const autoSaveState = {
 
 extension_settings[extensionName] = settings;
 
-function getActiveProfile() {
-    if (!settings.profile || typeof settings.profile !== "object") {
-        settings.profile = ensureSettingsShape().profile;
+const uiState = {
+    profileSelect: null,
+    profilePill: null,
+    profileCreateButton: null,
+    profileDuplicateButton: null,
+    profileRenameButton: null,
+    profileDeleteButton: null,
+    profileExportButton: null,
+    profileImportButton: null,
+    profileImportInput: null,
+    baseFolderInput: null,
+};
+
+function getProfiles() {
+    if (!settings.profiles || typeof settings.profiles !== "object" || Array.isArray(settings.profiles)) {
+        settings.profiles = { [DEFAULT_PROFILE_NAME]: ensureProfileShape() };
     }
-    return settings.profile;
+    return settings.profiles;
+}
+
+function getActiveProfileName() {
+    const profiles = getProfiles();
+    let activeName = typeof settings.activeProfile === "string" ? settings.activeProfile.trim() : "";
+    if (!activeName || !profiles[activeName]) {
+        activeName = Object.keys(profiles)[0] || DEFAULT_PROFILE_NAME;
+    }
+
+    if (!profiles[activeName]) {
+        profiles[activeName] = ensureProfileShape();
+    }
+
+    settings.activeProfile = activeName;
+    return activeName;
+}
+
+function getActiveProfile() {
+    const profiles = getProfiles();
+    const activeName = getActiveProfileName();
+    return profiles[activeName];
+}
+
+function normalizeProfileNameInput(value) {
+    if (value == null) {
+        return "";
+    }
+    return String(value).replace(/\s+/g, " ").trim();
+}
+
+function ensureUniqueProfileName(baseName) {
+    const profiles = getProfiles();
+    const sanitized = normalizeProfileNameInput(baseName) || DEFAULT_PROFILE_NAME;
+    if (!profiles[sanitized]) {
+        return sanitized;
+    }
+
+    let counter = 2;
+    let candidate = `${sanitized} ${counter}`;
+    while (profiles[candidate]) {
+        counter += 1;
+        candidate = `${sanitized} ${counter}`;
+    }
+    return candidate;
+}
+
+function updateProfilePill() {
+    if (!uiState.profilePill) {
+        return;
+    }
+
+    const activeName = getActiveProfileName();
+    const profile = getActiveProfile();
+    const folder = profile?.baseFolder ? normalizeCostumeFolder(profile.baseFolder) : "";
+
+    const parts = [`<strong>${escapeHtml(activeName)}</strong>`];
+    if (folder) {
+        parts.push(`<span class="cs-profile-pill-folder">${escapeHtml(folder)}</span>`);
+    }
+
+    uiState.profilePill.innerHTML = `Active: ${parts.join(" · ")}`;
+}
+
+function syncProfileActionStates() {
+    const profiles = getProfiles();
+    const profileCount = Object.keys(profiles).length;
+
+    if (uiState.profileDeleteButton) {
+        uiState.profileDeleteButton.disabled = profileCount <= 1;
+    }
+    if (uiState.profileDuplicateButton) {
+        uiState.profileDuplicateButton.disabled = profileCount === 0;
+    }
+    if (uiState.profileRenameButton) {
+        uiState.profileRenameButton.disabled = profileCount === 0;
+    }
+    if (uiState.profileExportButton) {
+        uiState.profileExportButton.disabled = profileCount === 0;
+    }
+}
+
+function populateProfileSelect() {
+    if (!uiState.profileSelect) {
+        return;
+    }
+
+    const profiles = getProfiles();
+    const activeName = getActiveProfileName();
+    const entries = Object.keys(profiles);
+
+    uiState.profileSelect.innerHTML = "";
+    entries.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        if (name === activeName) {
+            option.selected = true;
+        }
+        uiState.profileSelect.appendChild(option);
+    });
+
+    uiState.profileSelect.value = activeName;
+    syncProfileActionStates();
+}
+
+function syncBaseFolderInput() {
+    if (!uiState.baseFolderInput) {
+        return;
+    }
+
+    const profile = getActiveProfile();
+    const desiredValue = profile?.baseFolder || "";
+    if (uiState.baseFolderInput.value !== desiredValue) {
+        uiState.baseFolderInput.value = desiredValue;
+    }
+}
+
+function refreshProfileUI() {
+    populateProfileSelect();
+    updateProfilePill();
+    syncBaseFolderInput();
+    renderVariants();
+    renderTriggers();
+}
+
+function setActiveProfile(profileName, { announce = true } = {}) {
+    const profiles = getProfiles();
+    const normalized = normalizeProfileNameInput(profileName);
+    if (!normalized || !profiles[normalized]) {
+        showStatus(`Profile "${escapeHtml(profileName || "")}" was not found.`, "error");
+        populateProfileSelect();
+        return false;
+    }
+
+    if (settings.activeProfile === normalized) {
+        refreshProfileUI();
+        return false;
+    }
+
+    flushAutoSave({ showStatusMessage: false });
+    settings.activeProfile = normalized;
+    persistSettings("activeProfile");
+    refreshProfileUI();
+
+    if (announce) {
+        showStatus(`Switched to <b>${escapeHtml(normalized)}</b>.`, "success", 2000);
+    }
+
+    return true;
+}
+
+function createProfileFromTemplate({ name, template, announce = true, reason = "profiles" } = {}) {
+    const profiles = getProfiles();
+    const uniqueName = ensureUniqueProfileName(name);
+    const sourceProfile = template && typeof template === "object" ? template : ensureProfileShape();
+
+    flushAutoSave({ showStatusMessage: false });
+    profiles[uniqueName] = ensureProfileShape(sourceProfile);
+    settings.activeProfile = uniqueName;
+    persistSettings(reason);
+    refreshProfileUI();
+
+    if (announce) {
+        showStatus(`Created profile <b>${escapeHtml(uniqueName)}</b>.`, "success", 2200);
+    }
+
+    return uniqueName;
+}
+
+function handleProfileSelectChange(event) {
+    const selected = event?.target?.value;
+    if (!selected) {
+        return;
+    }
+    setActiveProfile(selected, { announce: true });
+}
+
+function handleCreateProfile() {
+    const defaultName = ensureUniqueProfileName("New Profile");
+    const raw = prompt("Name your new outfit profile:", defaultName);
+    if (raw === null) {
+        return;
+    }
+
+    const desired = normalizeProfileNameInput(raw);
+    if (!desired) {
+        showStatus("Enter a profile name to continue.", "error");
+        return;
+    }
+
+    const uniqueName = ensureUniqueProfileName(desired);
+    const createdName = createProfileFromTemplate({ name: uniqueName, announce: false });
+    if (createdName !== desired) {
+        showStatus(`Saved as <b>${escapeHtml(createdName)}</b> because that name was available.`, "info", 2600);
+    } else {
+        showStatus(`Created profile <b>${escapeHtml(createdName)}</b>.`, "success", 2200);
+    }
+}
+
+function handleDuplicateProfile() {
+    const activeProfile = getActiveProfile();
+    if (!activeProfile) {
+        showStatus("Create a profile before duplicating it.", "error");
+        return;
+    }
+
+    const baseName = `${getActiveProfileName()} Copy`;
+    const raw = prompt("Duplicate profile as:", ensureUniqueProfileName(baseName));
+    if (raw === null) {
+        return;
+    }
+
+    const desired = normalizeProfileNameInput(raw);
+    if (!desired) {
+        showStatus("Enter a profile name to duplicate.", "error");
+        return;
+    }
+
+    const uniqueName = ensureUniqueProfileName(desired);
+    const createdName = createProfileFromTemplate({ name: uniqueName, template: activeProfile, announce: false });
+    if (createdName !== desired) {
+        showStatus(`Saved duplicate as <b>${escapeHtml(createdName)}</b>.`, "info", 2400);
+    } else {
+        showStatus(`Duplicated profile to <b>${escapeHtml(createdName)}</b>.`, "success", 2200);
+    }
+}
+
+function handleRenameProfile() {
+    const activeName = getActiveProfileName();
+    const raw = prompt(`Rename "${activeName}" to:`, activeName);
+    if (raw === null) {
+        return;
+    }
+
+    const desired = normalizeProfileNameInput(raw);
+    if (!desired) {
+        showStatus("Enter a profile name to continue.", "error");
+        populateProfileSelect();
+        return;
+    }
+
+    if (desired === activeName) {
+        showStatus("Profile name unchanged.", "info");
+        return;
+    }
+
+    const profiles = getProfiles();
+    if (profiles[desired]) {
+        showStatus("A profile with that name already exists.", "error");
+        return;
+    }
+
+    flushAutoSave({ showStatusMessage: false });
+    profiles[desired] = profiles[activeName];
+    delete profiles[activeName];
+    settings.activeProfile = desired;
+    persistSettings("profiles");
+    refreshProfileUI();
+    showStatus(`Renamed profile to <b>${escapeHtml(desired)}</b>.`, "success", 2200);
+}
+
+function handleDeleteProfile() {
+    const profiles = getProfiles();
+    const activeName = getActiveProfileName();
+    if (Object.keys(profiles).length <= 1) {
+        showStatus("Keep at least one profile available.", "error");
+        return;
+    }
+
+    const confirmed = confirm(`Delete the "${activeName}" profile? This cannot be undone.`);
+    if (!confirmed) {
+        populateProfileSelect();
+        return;
+    }
+
+    flushAutoSave({ showStatusMessage: false });
+    delete profiles[activeName];
+    settings.activeProfile = Object.keys(profiles)[0] || DEFAULT_PROFILE_NAME;
+    persistSettings("profiles");
+    refreshProfileUI();
+    showStatus(`Deleted <b>${escapeHtml(activeName)}</b>. Switched to <b>${escapeHtml(getActiveProfileName())}</b>.`, "success", 2600);
+}
+
+function handleExportProfile() {
+    const activeName = getActiveProfileName();
+    const profile = getActiveProfile();
+    if (!profile) {
+        showStatus("No profile available to export.", "error");
+        return;
+    }
+
+    flushAutoSave({ showStatusMessage: false });
+
+    const payload = {
+        name: activeName,
+        profile,
+        version: settings.version,
+    };
+
+    const json = JSON.stringify(payload, null, 2);
+    const dataUrl = `data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    const safeName = activeName.replace(/[^a-z0-9-_]+/gi, "_");
+    link.download = `${safeName || "outfit_profile"}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    showStatus(`Exported <b>${escapeHtml(activeName)}</b> to a .json file.`, "success", 2200);
+}
+
+async function handleProfileImport(event) {
+    const input = event?.target;
+    const file = input?.files?.[0];
+    if (!file) {
+        return;
+    }
+
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const profileData = parsed?.profile || parsed?.data || parsed;
+        if (!profileData || typeof profileData !== "object") {
+            throw new Error("Invalid profile file");
+        }
+
+        const nameCandidate = parsed?.name || parsed?.profileName || file.name.replace(/\.[^.]+$/, "");
+        const uniqueName = ensureUniqueProfileName(nameCandidate || "Imported Profile");
+        const createdName = createProfileFromTemplate({ name: uniqueName, template: profileData, announce: false });
+        showStatus(`Imported profile <b>${escapeHtml(createdName)}</b>.`, "success", 2400);
+    } catch (error) {
+        console.error(`${logPrefix} Failed to import profile`, error);
+        showStatus("Unable to import that profile file.", "error", 3200);
+    } finally {
+        if (uiState.profileImportInput) {
+            uiState.profileImportInput.value = "";
+        }
+    }
 }
 
 function persistSettings(reason = "update") {
@@ -1034,6 +1390,7 @@ function handleBaseFolderInput(event) {
     const profile = getActiveProfile();
     profile.baseFolder = event.target.value.trim();
     scheduleAutoSave({ key: "baseFolder", element: event.target });
+    updateProfilePill();
 }
 
 async function runTriggerByName(triggerName, source = "slash") {
@@ -1067,6 +1424,15 @@ function bindUI() {
     const addVariantButton = getElement("#cs-add-variant");
     const addTriggerButton = getElement("#cs-add-trigger");
     const runBaseButton = getElement("#cs-run-base");
+    uiState.profileSelect = getElement("#cs-profile-select");
+    uiState.profilePill = getElement("#cs-profile-pill");
+    uiState.profileCreateButton = getElement("#cs-profile-create");
+    uiState.profileDuplicateButton = getElement("#cs-profile-duplicate");
+    uiState.profileRenameButton = getElement("#cs-profile-rename");
+    uiState.profileDeleteButton = getElement("#cs-profile-delete");
+    uiState.profileExportButton = getElement("#cs-profile-export");
+    uiState.profileImportButton = getElement("#cs-profile-import");
+    uiState.profileImportInput = getElement("#cs-profile-import-file");
 
     if (enableCheckbox) {
         enableCheckbox.checked = settings.enabled;
@@ -1074,8 +1440,7 @@ function bindUI() {
     }
 
     if (baseFolderInput) {
-        const profile = getActiveProfile();
-        baseFolderInput.value = profile.baseFolder;
+        uiState.baseFolderInput = baseFolderInput;
         baseFolderInput.addEventListener("input", handleBaseFolderInput);
     }
 
@@ -1105,8 +1470,39 @@ function bindUI() {
         });
     }
 
-    renderVariants();
-    renderTriggers();
+    if (uiState.profileSelect) {
+        uiState.profileSelect.addEventListener("change", handleProfileSelectChange);
+    }
+
+    if (uiState.profileCreateButton) {
+        uiState.profileCreateButton.addEventListener("click", handleCreateProfile);
+    }
+
+    if (uiState.profileDuplicateButton) {
+        uiState.profileDuplicateButton.addEventListener("click", handleDuplicateProfile);
+    }
+
+    if (uiState.profileRenameButton) {
+        uiState.profileRenameButton.addEventListener("click", handleRenameProfile);
+    }
+
+    if (uiState.profileDeleteButton) {
+        uiState.profileDeleteButton.addEventListener("click", handleDeleteProfile);
+    }
+
+    if (uiState.profileExportButton) {
+        uiState.profileExportButton.addEventListener("click", handleExportProfile);
+    }
+
+    if (uiState.profileImportButton && uiState.profileImportInput) {
+        uiState.profileImportButton.addEventListener("click", () => uiState.profileImportInput.click());
+    }
+
+    if (uiState.profileImportInput) {
+        uiState.profileImportInput.addEventListener("change", handleProfileImport);
+    }
+
+    refreshProfileUI();
 }
 
 function initSlashCommand() {

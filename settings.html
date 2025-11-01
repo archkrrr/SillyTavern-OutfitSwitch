@@ -33,6 +33,57 @@
                     </div>
                 </section>
 
+                <section class="cs-card cs-profile-card">
+                    <header class="cs-card-header">
+                        <div class="cs-card-title">
+                            <i class="fa-solid fa-id-badge"></i>
+                            <div>
+                                <h3>Profiles</h3>
+                                <p>Save multiple outfit presets for the same focus character.</p>
+                            </div>
+                        </div>
+                        <span id="cs-profile-pill" class="cs-profile-pill" role="status" aria-live="polite">Active: <strong>Default</strong></span>
+                    </header>
+                    <div class="cs-card-body cs-card-body--stacked">
+                        <div class="cs-toolbar cs-toolbar--wrap">
+                            <label class="cs-field cs-field-inline">
+                                <span>Active Profile</span>
+                                <select id="cs-profile-select" class="text_pole" title="Choose a saved profile"></select>
+                            </label>
+                            <div class="cs-profile-actions">
+                                <button id="cs-profile-create" class="menu_button interactable cs-button-ghost" type="button" title="Create a fresh profile from defaults">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>New</span>
+                                </button>
+                                <button id="cs-profile-duplicate" class="menu_button interactable cs-button-ghost" type="button" title="Duplicate the active profile">
+                                    <i class="fa-solid fa-copy"></i>
+                                    <span>Duplicate</span>
+                                </button>
+                                <button id="cs-profile-rename" class="menu_button interactable cs-button-ghost" type="button" title="Rename the active profile">
+                                    <i class="fa-solid fa-pen"></i>
+                                    <span>Rename</span>
+                                </button>
+                                <button id="cs-profile-delete" class="menu_button interactable cs-button-danger" type="button" title="Delete the active profile">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cs-toolbar cs-toolbar--wrap">
+                            <button id="cs-profile-export" class="menu_button interactable" type="button" title="Export the active profile to a JSON file">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                                <span>Export</span>
+                            </button>
+                            <button id="cs-profile-import" class="menu_button interactable" type="button" title="Import a profile from a JSON file">
+                                <i class="fa-solid fa-file-arrow-up"></i>
+                                <span>Import</span>
+                            </button>
+                            <input id="cs-profile-import-file" type="file" accept=".json" hidden />
+                        </div>
+                        <p class="cs-helper-text">Profiles capture the base folder, variants, and triggers so you can hop between arcs or timelines without rebuilding your shortcuts.</p>
+                    </div>
+                </section>
+
                 <div class="cs-layout">
                     <div class="cs-column">
                         <section class="cs-card">
