@@ -1,5 +1,31 @@
 export const SCHEMA_VERSION = 3;
 
+function gatherTriggerStrings(value) {
+    const results = [];
+    const visit = (entry) => {
+        if (entry == null) {
+            return;
+        }
+        if (Array.isArray(entry)) {
+            entry.forEach(visit);
+            return;
+        }
+        if (typeof entry === "string") {
+            entry
+                .split(/\r?\n|,/)
+                .map((part) => part.trim())
+                .filter(Boolean)
+                .forEach((part) => {
+                    if (!results.includes(part)) {
+                        results.push(part);
+                    }
+                });
+        }
+    };
+    visit(value);
+    return results;
+}
+
 function cloneVariants(variants) {
     if (!Array.isArray(variants)) {
         return [];
@@ -21,14 +47,38 @@ export function normalizeVariantEntry(entry = {}) {
 }
 
 export function normalizeTriggerEntry(entry = {}) {
-    const trigger = typeof entry.trigger === "string" ? entry.trigger.trim() : "";
-    let folder = "";
-    if (typeof entry.folder === "string") {
-        folder = entry.folder.trim();
-    } else if (typeof entry.costume === "string") {
-        folder = entry.costume.trim();
+    const normalizedEntry = typeof entry === "string" ? { trigger: entry } : { ...entry };
+
+    const folder = typeof normalizedEntry.folder === "string"
+        ? normalizedEntry.folder.trim()
+        : (typeof normalizedEntry.costume === "string" ? normalizedEntry.costume.trim() : "");
+
+    const triggers = gatherTriggerStrings([
+        normalizedEntry.triggers,
+        normalizedEntry.trigger,
+        normalizedEntry.matchers,
+        normalizedEntry.matcher,
+        normalizedEntry.aliases,
+        normalizedEntry.patterns,
+    ]);
+
+    const trimmedPrimary = typeof normalizedEntry.trigger === "string"
+        ? normalizedEntry.trigger.trim()
+        : "";
+
+    if (trimmedPrimary) {
+        const existingIndex = triggers.indexOf(trimmedPrimary);
+        if (existingIndex === -1) {
+            triggers.unshift(trimmedPrimary);
+        } else if (existingIndex > 0) {
+            triggers.splice(existingIndex, 1);
+            triggers.unshift(trimmedPrimary);
+        }
     }
-    return { trigger, folder };
+
+    const primaryTrigger = trimmedPrimary || (triggers.length ? triggers[0] : "");
+
+    return { trigger: primaryTrigger, triggers, folder };
 }
 
 export function ensureProfileShape(rawProfile = {}) {
@@ -92,9 +142,12 @@ export function findCostumeForTrigger(settingsOrProfile, key) {
     }
 
     for (const entry of profile.triggers) {
-        const normalized = String(entry?.trigger ?? "").trim().toLowerCase();
-        if (normalized && normalized === lookup) {
-            return composeCostumePath(profile.baseFolder, entry.folder);
+        const triggers = gatherTriggerStrings([entry?.triggers, entry?.trigger]);
+        for (const trigger of triggers) {
+            const normalized = trigger.trim().toLowerCase();
+            if (normalized && normalized === lookup) {
+                return composeCostumePath(profile.baseFolder, entry.folder);
+            }
         }
     }
 

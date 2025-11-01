@@ -29,14 +29,29 @@ test("ensure settings shape nests legacy fields into profile", () => {
     assert.equal(result.version, SCHEMA_VERSION);
     assert.equal(result.profile.baseFolder, "Hero");
     assert.deepEqual(result.profile.variants, [{ name: "Casual", folder: "casual" }]);
-    assert.deepEqual(result.profile.triggers, [{ trigger: "Battle", folder: "armor" }]);
+    assert.deepEqual(result.profile.triggers, [
+        { trigger: "Battle", triggers: ["Battle"], folder: "armor" },
+    ]);
     assert.equal("character" in result.profile, false);
 });
 
 test("normalize trigger entry trims values and supports legacy costume", () => {
     const entry = normalizeTriggerEntry({ trigger: "  Battle  ", costume: "  armor  " });
     assert.equal(entry.trigger, "Battle");
+    assert.deepEqual(entry.triggers, ["Battle"]);
     assert.equal(entry.folder, "armor");
+});
+
+test("normalize trigger entry collects multiple trigger formats", () => {
+    const entry = normalizeTriggerEntry({
+        trigger: " Battle ",
+        triggers: [" Fight ", "Battle", "guard"],
+        matcher: "slash",
+        patterns: "strike,\n parry ",
+    });
+
+    assert.equal(entry.trigger, "Battle");
+    assert.deepEqual(entry.triggers, ["Battle", "Fight", "guard", "slash", "strike", "parry"]);
 });
 
 test("normalize variant entry trims values", () => {
@@ -69,6 +84,21 @@ test("find costume for trigger is case-insensitive and respects base folder", ()
     assert.equal(findCostumeForTrigger(settings, "battle"), "hero/armor");
     assert.equal(findCostumeForTrigger(settings, "RELAX"), "hero/casual");
     assert.equal(findCostumeForTrigger(settings, "unknown"), "");
+});
+
+test("find costume for trigger matches any alias", () => {
+    const settings = ensureSettingsShape({
+        baseFolder: "hero",
+        triggers: [
+            { trigger: "Battle", folder: "armor" },
+            { trigger: "Chill", triggers: ["relax", "breeze"], folder: "casual" },
+            { trigger: "Stealth", triggers: "sneak, shadow\n night", folder: "stealth" },
+        ],
+    });
+
+    assert.equal(findCostumeForTrigger(settings, "Relax"), "hero/casual");
+    assert.equal(findCostumeForTrigger(settings, "shadow"), "hero/stealth");
+    assert.equal(findCostumeForTrigger(settings, "night"), "hero/stealth");
 });
 
 test("find costume for trigger works when provided a profile object", () => {
