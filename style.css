@@ -247,6 +247,26 @@
     gap: 6px;
 }
 
+#costume-switcher-settings.cs-theme .cs-folder-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#costume-switcher-settings.cs-theme .cs-folder-picker .text_pole {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+#costume-switcher-settings.cs-theme .cs-folder-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    padding: 8px 14px;
+}
+
 #costume-switcher-settings.cs-theme .cs-field span {
     font-size: 0.95rem;
     color: var(--header-text);
