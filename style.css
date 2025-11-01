@@ -85,6 +85,26 @@
     opacity: 0.55;
     pointer-events: none;
     z-index: 1;
+    background-size: 160% 160%, 140% 140%;
+    background-position: 0% 0%, 100% 100%;
+}
+
+#outfit-switcher-settings.cs-theme .cs-card:not(.cs-header-card)::after {
+    animation: cs-card-gradient-drift 16s ease-in-out infinite alternate;
+}
+
+@keyframes cs-card-gradient-drift {
+    0% {
+        background-position: 0% 0%, 100% 100%;
+    }
+
+    50% {
+        background-position: 12% 18%, 88% 82%;
+    }
+
+    100% {
+        background-position: 0% 0%, 100% 100%;
+    }
 }
 
 #outfit-switcher-settings.cs-theme .cs-card > * {
