@@ -5,71 +5,115 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="cs-panel">
+            <div class="cs-shell">
+                <section class="cs-card cs-header-card">
+                    <div class="cs-header-intro">
+                        <h2 class="cs-title">Outfit Switcher</h2>
+                        <p class="cs-subtitle">Quickly update your focus character's appearance with curated folders and triggers.</p>
+                    </div>
+                    <div class="cs-header-meta">
+                        <label class="cs-master-toggle">
+                            <input id="cs-enable" type="checkbox" />
+                            <span class="cs-switch-thumb" aria-hidden="true"></span>
+                            <div class="cs-switch-copy">
+                                <strong>Enable Outfit Switching</strong>
+                                <small>Pause outfit updates without clearing your configured folders.</small>
+                            </div>
+                        </label>
+                        <button id="cs-run-base" class="menu_button interactable cs-button-primary" type="button">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Run Base Outfit</span>
+                        </button>
+                    </div>
+                </section>
+
                 <section class="cs-card">
                     <header class="cs-card-header">
-                        <h3>Character Folder</h3>
-                        <p>Set the base character folder and enable quick outfit switching.</p>
+                        <div class="cs-card-title">
+                            <i class="fa-solid fa-folder-tree"></i>
+                            <div>
+                                <h3>Character Folder</h3>
+                                <p>Set the base character folder used for every outfit change.</p>
+                            </div>
+                        </div>
                     </header>
                     <div class="cs-card-body">
                         <label class="cs-field">
-                            <span>Enable Outfit Switcher</span>
-                            <input id="cs-enable" type="checkbox" />
+                            <span>Base Character Folder</span>
+                            <input id="cs-base-folder" class="text_pole" type="text" placeholder="Character folder" />
                         </label>
-                        <div class="cs-default-row">
-                            <label class="cs-field cs-field--inline">
-                                <span>Base Character Folder</span>
-                                <input id="cs-base-folder" class="text_pole" type="text" placeholder="Character folder" />
-                            </label>
-                            <button id="cs-run-base" class="menu_button interactable" type="button">Run Base</button>
+                        <p class="cs-helper-text">Folder paths are relative to your SillyTavern characters directory.</p>
+                    </div>
+                </section>
+
+                <section class="cs-card">
+                    <header class="cs-card-header">
+                        <div class="cs-card-title">
+                            <i class="fa-solid fa-shirt"></i>
+                            <div>
+                                <h3>Outfit Variants</h3>
+                                <p>Create quick shortcuts for alternate outfit folders.</p>
+                            </div>
                         </div>
-                        <p class="cs-helper">Folder paths are relative to your SillyTavern characters directory.</p>
+                        <div class="cs-card-actions">
+                            <button id="cs-add-variant" class="menu_button interactable cs-button-ghost" type="button">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add Variant</span>
+                            </button>
+                        </div>
+                    </header>
+                    <div class="cs-card-body">
+                        <div class="cs-table-scroll">
+                            <table class="cs-table cs-variant-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variant Name</th>
+                                        <th>Subfolder</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cs-variant-table-body"></tbody>
+                            </table>
+                        </div>
+                        <p class="cs-helper-text">Variants append their subfolder to the base folder when switching.</p>
                     </div>
                 </section>
 
                 <section class="cs-card">
                     <header class="cs-card-header">
-                        <h3>Outfit Variants</h3>
-                        <p>List optional subfolders to swap outfits quickly.</p>
+                        <div class="cs-card-title">
+                            <i class="fa-solid fa-terminal"></i>
+                            <div>
+                                <h3>Triggers</h3>
+                                <p>Map optional slash commands or manual triggers to variant folders.</p>
+                            </div>
+                        </div>
+                        <div class="cs-card-actions">
+                            <button id="cs-add-trigger" class="menu_button interactable cs-button-ghost" type="button">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add Trigger</span>
+                            </button>
+                        </div>
                     </header>
                     <div class="cs-card-body">
-                        <table class="cs-variant-table">
-                            <thead>
-                                <tr>
-                                    <th>Variant Name</th>
-                                    <th>Subfolder</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cs-variant-table-body"></tbody>
-                        </table>
-                        <button id="cs-add-variant" class="menu_button interactable" type="button">Add Variant</button>
-                        <p class="cs-helper">Variants append their subfolder to the base folder when switching.</p>
-                    </div>
-                </section>
-
-                <section class="cs-card">
-                    <header class="cs-card-header">
-                        <h3>Triggers</h3>
-                        <p>Map optional slash commands or manual triggers to variant folders.</p>
-                    </header>
-                    <div class="cs-card-body">
-                        <table class="cs-trigger-table">
-                            <thead>
-                                <tr>
-                                    <th>Trigger Name</th>
-                                    <th>Variant Folder</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cs-trigger-table-body"></tbody>
-                        </table>
-                        <button id="cs-add-trigger" class="menu_button interactable" type="button">Add Trigger</button>
-                        <p class="cs-helper">Use <code>/outfitswitch &lt;trigger&gt;</code> in chat to change outfits via slash command.</p>
+                        <div class="cs-table-scroll">
+                            <table class="cs-table cs-trigger-table">
+                                <thead>
+                                    <tr>
+                                        <th>Trigger Name</th>
+                                        <th>Variant Folder</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cs-trigger-table-body"></tbody>
+                            </table>
+                        </div>
+                        <p class="cs-helper-text">Use <code>/outfitswitch &lt;trigger&gt;</code> in chat to change outfits via slash command.</p>
                     </div>
                 </section>
 
                 <div id="cs-status" class="cs-status" role="status" aria-live="polite">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span id="cs-status-text" class="cs-status-text">Ready</span>
                 </div>
             </div>
