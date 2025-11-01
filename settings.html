@@ -47,6 +47,16 @@
                             <label class="cs-field cs-field-inline">
                                 <span>Active Profile</span>
                                 <select id="os-profile-select" class="text_pole" title="Choose a saved profile"></select>
+                                <div class="cs-profile-io">
+                                    <button id="os-profile-export" class="menu_button interactable cs-button-ghost" type="button" title="Export the active profile to a JSON file">
+                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                        <span>Export</span>
+                                    </button>
+                                    <button id="os-profile-import" class="menu_button interactable cs-button-ghost" type="button" title="Import a profile from a JSON file">
+                                        <i class="fa-solid fa-file-arrow-up"></i>
+                                        <span>Import</span>
+                                    </button>
+                                </div>
                             </label>
                             <div class="cs-profile-actions">
                                 <button id="os-profile-create" class="menu_button interactable cs-button-ghost" type="button" title="Create a fresh profile from defaults">
@@ -66,16 +76,6 @@
                                     <span>Delete</span>
                                 </button>
                             </div>
-                        </div>
-                        <div class="cs-toolbar cs-toolbar--wrap">
-                            <button id="os-profile-export" class="menu_button interactable" type="button" title="Export the active profile to a JSON file">
-                                <i class="fa-solid fa-file-arrow-down"></i>
-                                <span>Export</span>
-                            </button>
-                            <button id="os-profile-import" class="menu_button interactable" type="button" title="Import a profile from a JSON file">
-                                <i class="fa-solid fa-file-arrow-up"></i>
-                                <span>Import</span>
-                            </button>
                             <input id="os-profile-import-file" type="file" accept=".json" hidden />
                         </div>
                         <p class="cs-helper-text">Profiles capture the base folder, variants, and triggers so you can hop between arcs or timelines without rebuilding your shortcuts.</p>

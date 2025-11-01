@@ -481,6 +481,12 @@
     flex: 1 1 240px;
 }
 
+#outfit-switcher-settings.cs-theme .cs-profile-io {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 #outfit-switcher-settings.cs-theme .cs-profile-pill {
     display: inline-flex;
     align-items: center;
