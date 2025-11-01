@@ -316,6 +316,33 @@
     align-items: center;
 }
 
+#costume-switcher-settings.cs-theme .cs-trigger-column {
+    vertical-align: top;
+}
+
+#costume-switcher-settings.cs-theme .cs-trigger-input {
+    width: 100%;
+    min-height: 64px;
+    resize: vertical;
+    line-height: 1.4;
+}
+
+#costume-switcher-settings.cs-theme .cs-trigger-helper {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+#costume-switcher-settings.cs-theme .cs-trigger-column-folder .cs-folder-picker {
+    align-items: stretch;
+}
+
+#costume-switcher-settings.cs-theme .cs-trigger-column-folder .cs-folder-input {
+    width: 100%;
+}
+
 #costume-switcher-settings.cs-theme .cs-trigger-actions .menu_button,
 #costume-switcher-settings.cs-theme .cs-variant-actions .menu_button {
     padding: 6px 12px;

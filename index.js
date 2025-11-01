@@ -257,6 +257,25 @@ function removeTriggerRow(index) {
     renderTriggers();
 }
 
+function parseTriggerTextareaValue(value) {
+    if (typeof value !== "string" || !value.trim()) {
+        return [];
+    }
+
+    const results = [];
+    value
+        .split(/\r?\n|,/)
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .forEach((part) => {
+            if (!results.includes(part)) {
+                results.push(part);
+            }
+        });
+
+    return results;
+}
+
 function bindTriggerInputs(row, index) {
     const triggerInput = row.querySelector(".cs-trigger-input");
     const folderInput = row.querySelector(".cs-folder-input");
@@ -265,12 +284,17 @@ function bindTriggerInputs(row, index) {
     const folderButton = row.querySelector(".cs-trigger-folder-select");
 
     const profile = getActiveProfile();
-    triggerInput.value = profile.triggers[index].trigger;
+    const triggerList = Array.isArray(profile.triggers[index].triggers) && profile.triggers[index].triggers.length
+        ? profile.triggers[index].triggers
+        : (profile.triggers[index].trigger ? [profile.triggers[index].trigger] : []);
+    triggerInput.value = triggerList.join("\n");
     folderInput.value = profile.triggers[index].folder;
 
     triggerInput.addEventListener("input", (event) => {
         const activeProfile = getActiveProfile();
-        activeProfile.triggers[index].trigger = event.target.value;
+        const triggers = parseTriggerTextareaValue(event.target.value);
+        activeProfile.triggers[index].triggers = triggers;
+        activeProfile.triggers[index].trigger = triggers[0] || "";
         persistSettings("triggers");
     });
 
@@ -312,8 +336,11 @@ function renderTriggers() {
     profile.triggers.forEach((trigger, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td><input type="text" class="text_pole cs-trigger-input" placeholder="Trigger" /></td>
-            <td>
+            <td class="cs-trigger-column cs-trigger-column-triggers">
+                <textarea class="text_pole cs-trigger-input" rows="2" placeholder="One trigger per line"></textarea>
+                <small class="cs-trigger-helper">Matches case-insensitive triggers just like the full Costume Switcher.</small>
+            </td>
+            <td class="cs-trigger-column cs-trigger-column-folder">
                 <div class="cs-folder-picker">
                     <input type="text" class="text_pole cs-folder-input" placeholder="Variant folder" />
                     <button type="button" class="menu_button interactable cs-button-ghost cs-folder-button cs-trigger-folder-select">
