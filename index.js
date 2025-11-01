@@ -405,11 +405,11 @@ function automationMessageHandler(...args) {
 }
 
 function automationGenerationStartedHandler(...args) {
-    resetStreamTracking();
     if (!settings.enabled) {
         return;
     }
 
+    resetStreamTracking();
     const reference = resolveStreamReference(args);
     if (reference) {
         automationState.streamKey = reference;
@@ -433,8 +433,11 @@ function automationStreamHandler(...args) {
         return;
     }
 
-    if (!automationState.streamKey) {
-        const reference = resolveStreamReference(args);
+    const reference = resolveStreamReference(args);
+    if (reference && automationState.streamKey && automationState.streamKey !== reference) {
+        resetStreamTracking();
+        automationState.streamKey = reference;
+    } else if (!automationState.streamKey) {
         automationState.streamKey = reference || `stream-${Date.now()}`;
     }
 
@@ -470,8 +473,13 @@ function registerAutomationHandlers() {
         .filter((eventName) => typeof eventName === "string");
     const generationEvents = [event_types?.GENERATION_STARTED]
         .filter((eventName) => typeof eventName === "string");
-    const resetEvents = [event_types?.CHAT_CHANGED]
-        .filter((eventName) => typeof eventName === "string");
+    const resetEvents = [
+        event_types?.CHAT_CHANGED,
+        event_types?.STREAM_ENDED,
+        event_types?.STREAM_FINISHED,
+        event_types?.STREAM_COMPLETE,
+        event_types?.GENERATION_ENDED,
+    ].filter((eventName) => typeof eventName === "string");
 
     events.forEach((eventName) => {
         eventSource.on(eventName, automationMessageHandler);
