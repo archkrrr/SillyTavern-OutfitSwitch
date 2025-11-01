@@ -1,7 +1,7 @@
 #outfit-switcher-settings.cs-theme {
     --card-radius: 14px;
-    --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-    --card-shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.12);
+    --card-shadow: 0 16px 42px rgba(8, 12, 24, 0.38);
+    --card-shadow-soft: 0 10px 28px rgba(8, 12, 24, 0.24);
     --accent: var(--primary-color, #6c5ce7);
     --accent-soft: rgba(108, 92, 231, 0.15);
     --accent-strong: rgba(108, 92, 231, 0.35);
@@ -23,8 +23,9 @@
 #outfit-switcher-settings.cs-theme .inline-drawer-content {
     padding: 22px;
     border-radius: 20px;
-    background: linear-gradient(165deg, rgba(108, 92, 231, 0.12), rgba(46, 213, 115, 0.08)) var(--surface);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    background: linear-gradient(160deg, rgba(108, 92, 231, 0.18), rgba(46, 213, 115, 0.12)) var(--surface);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px);
     color: var(--text-color);
     font-family: "Inter", "Roboto", sans-serif;
     margin-top: 10px;
@@ -37,22 +38,28 @@
 #outfit-switcher-settings.cs-theme .cs-shell {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    max-width: 980px;
+    gap: 28px;
+    max-width: 1020px;
     margin: 0 auto;
+    padding-bottom: 10px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.18));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface) 88%, rgba(255, 255, 255, 0.08)),
+        color-mix(in srgb, var(--surface-soft) 82%, rgba(0, 0, 0, 0.36))
+    );
     border-radius: var(--card-radius);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: var(--card-shadow-soft);
-    padding: 24px;
+    padding: 26px;
     display: flex;
     flex-direction: column;
     gap: 20px;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(20px);
 }
 
 #outfit-switcher-settings.cs-theme .cs-card::before {
@@ -60,8 +67,9 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     pointer-events: none;
+    opacity: 0.85;
 }
 
 #outfit-switcher-settings.cs-theme .cs-card-header {
@@ -75,17 +83,23 @@
 #outfit-switcher-settings.cs-theme .cs-card-title {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-card-title i {
-    font-size: 1.4em;
+    font-size: 1.15rem;
     color: var(--accent);
-    margin-top: 2px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent) 16%, rgba(255, 255, 255, 0.12));
+    box-shadow: 0 8px 18px rgba(108, 92, 231, 0.22);
 }
 
 #outfit-switcher-settings.cs-theme .cs-card-title h3 {
-    font-size: 1.1rem;
+    font-size: 1.12rem;
     margin: 0;
     color: var(--header-text);
 }
@@ -100,20 +114,19 @@
 #outfit-switcher-settings.cs-theme .cs-card-body {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-card-body--stacked {
-    gap: 18px;
+    gap: 20px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-header-card {
-    gap: 18px;
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.26), rgba(46, 213, 115, 0.18));
+    gap: 20px;
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--accent) 35%, transparent),
-        color-mix(in srgb, var(--accent-secondary) 24%, transparent)
+        color-mix(in srgb, var(--accent) 38%, rgba(20, 20, 35, 0.55)),
+        color-mix(in srgb, var(--accent-secondary) 26%, rgba(0, 0, 0, 0.45))
     );
     color: var(--header-text);
 }
@@ -142,14 +155,14 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: 16px;
+    gap: 18px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-header-controls {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 18px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
@@ -290,13 +303,13 @@
 }
 
 #outfit-switcher-settings.cs-theme .cs-button-ghost {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: var(--header-text);
 }
 
 #outfit-switcher-settings.cs-theme .cs-button-ghost:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.18);
 }
 
 #outfit-switcher-settings.cs-theme .cs-field {
@@ -319,32 +332,32 @@
 #outfit-switcher-settings.cs-theme .cs-toolbar {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 14px;
     width: 100%;
 }
 
 #outfit-switcher-settings.cs-theme .cs-toolbar--wrap {
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-toolbar .text_pole,
 #outfit-switcher-settings.cs-theme .cs-toolbar select.text_pole {
-    flex: 1 1 180px;
+    flex: 1 1 200px;
     min-width: 0;
 }
 
 #outfit-switcher-settings.cs-theme .cs-profile-card {
-    background: color-mix(in srgb, var(--surface) 94%, rgba(255, 255, 255, 0.06));
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: var(--card-shadow-soft);
+    background: color-mix(in srgb, var(--surface) 92%, rgba(255, 255, 255, 0.08));
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: var(--card-shadow);
 }
 
 #outfit-switcher-settings.cs-theme .cs-profile-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
     flex: 1 1 240px;
 }
@@ -388,12 +401,12 @@
 #outfit-switcher-settings.cs-theme .cs-folder-picker {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
 #outfit-switcher-settings.cs-theme .cs-folder-picker .text_pole {
-    flex: 1 1 220px;
+    flex: 1 1 260px;
     min-width: 0;
 }
 
@@ -419,119 +432,27 @@
 
 #outfit-switcher-settings.cs-theme .cs-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 28px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-column {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
 }
 
 #outfit-switcher-settings.cs-theme .cs-column--wide {
     grid-column: 1 / -1;
 }
 
-#outfit-switcher-settings.cs-theme .cs-guide-card {
-    background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 28%, transparent), rgba(0, 0, 0, 0.25));
-    border-color: color-mix(in srgb, var(--accent) 32%, transparent);
-    box-shadow: 0 12px 32px rgba(108, 92, 231, 0.12);
-}
-
-#outfit-switcher-settings.cs-theme .cs-tip-card {
-    background: linear-gradient(140deg, rgba(0, 0, 0, 0.22), rgba(255, 255, 255, 0.04));
-    border-color: rgba(255, 255, 255, 0.06);
-}
-
-#outfit-switcher-settings.cs-theme .cs-step-list {
-    counter-reset: cs-step;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-#outfit-switcher-settings.cs-theme .cs-step-list li {
-    counter-increment: cs-step;
-    position: relative;
-    padding: 14px 16px 14px 54px;
-    border-radius: 14px;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-    display: grid;
-    gap: 6px;
-}
-
-#outfit-switcher-settings.cs-theme .cs-step-list li::before {
-    content: counter(cs-step);
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: var(--accent);
-    color: #ffffff;
-    display: grid;
-    place-items: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    box-shadow: 0 0 0 6px var(--accent-soft);
-}
-
-#outfit-switcher-settings.cs-theme .cs-step-list strong {
-    font-size: 0.98rem;
-    color: var(--header-text);
-}
-
-#outfit-switcher-settings.cs-theme .cs-step-list span {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-#outfit-switcher-settings.cs-theme .cs-tip-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-#outfit-switcher-settings.cs-theme .cs-tip-list li {
-    position: relative;
-    padding-left: 22px;
-    color: var(--header-text);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-#outfit-switcher-settings.cs-theme .cs-tip-list li::before {
-    content: "•";
-    position: absolute;
-    left: 6px;
-    top: 0;
-    color: var(--accent-secondary);
-    font-size: 1.2rem;
-    line-height: 1;
-}
-
-#outfit-switcher-settings.cs-theme .cs-tip-list strong {
-    color: var(--header-text);
-}
-
 #outfit-switcher-settings.cs-theme .cs-table-scroll {
-    border-radius: 14px;
+    border-radius: 18px;
     overflow-x: auto;
     overflow-y: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: color-mix(in srgb, var(--surface) 86%, rgba(0, 0, 0, 0.26));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 #outfit-switcher-settings.cs-theme .cs-table {
@@ -541,15 +462,15 @@
 }
 
 #outfit-switcher-settings.cs-theme .cs-table thead {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--header-text);
 }
 
 #outfit-switcher-settings.cs-theme .cs-table th,
 #outfit-switcher-settings.cs-theme .cs-table td {
-    padding: 12px 14px;
+    padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 #outfit-switcher-settings.cs-theme .cs-table tbody tr:last-child td {
@@ -605,15 +526,16 @@
     margin-top: -8px;
     padding: 16px 18px;
     border-radius: 16px;
-    background: rgba(0, 0, 0, 0.22);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--surface) 88%, rgba(0, 0, 0, 0.28));
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--header-text);
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     opacity: 0;
     transform: translateY(6px);
     transition: opacity 150ms ease, transform 150ms ease;
+    box-shadow: 0 14px 28px rgba(8, 12, 24, 0.32);
 }
 
 #outfit-switcher-settings.cs-theme .cs-status.is-visible {
