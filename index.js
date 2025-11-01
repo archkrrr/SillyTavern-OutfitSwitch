@@ -43,16 +43,9 @@ function getActiveProfile() {
     return settings.profile;
 }
 
-function cloneSettings(value) {
-    if (typeof structuredClone === "function") {
-        return structuredClone(value);
-    }
-    return JSON.parse(JSON.stringify(value));
-}
-
 function persistSettings(reason = "update") {
     settings = ensureSettingsShape(settings);
-    extension_settings[extensionName] = cloneSettings(settings);
+    extension_settings[extensionName] = settings;
     try {
         saveSettingsDebounced?.(reason);
     } catch (err) {
@@ -160,21 +153,49 @@ function getElement(selector) {
     return document.querySelector(selector);
 }
 
-function getSettingsContainer() {
-    return document.querySelector("#extensions_settings");
+function waitForElement(selector, { timeout = 10000 } = {}) {
+    const existing = document.querySelector(selector);
+    if (existing) {
+        return Promise.resolve(existing);
+    }
+
+    return new Promise((resolve, reject) => {
+        const root = document.documentElement || document.body;
+        if (!root) {
+            reject(new Error("Document is not ready."));
+            return;
+        }
+
+        const observer = new MutationObserver(() => {
+            const element = document.querySelector(selector);
+            if (element) {
+                observer.disconnect();
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+                resolve(element);
+            }
+        });
+
+        const timeoutId = Number.isFinite(timeout) && timeout > 0
+            ? setTimeout(() => {
+                  observer.disconnect();
+                  reject(new Error(`Timed out waiting for selector: ${selector}`));
+              }, timeout)
+            : null;
+
+        observer.observe(root, { childList: true, subtree: true });
+    });
 }
 
 async function ensureSettingsPanel() {
     if (document.getElementById("outfit-switcher-settings")) {
-        return;
+        return document.getElementById("outfit-switcher-settings");
     }
 
     if (!settingsPanelPromise) {
         settingsPanelPromise = (async () => {
-            const container = getSettingsContainer();
-            if (!container) {
-                throw new Error("Unable to locate the SillyTavern extensions container.");
-            }
+            const container = await waitForElement("#extensions_settings");
 
             const settingsUrl = new URL("./settings.html", import.meta.url);
             const response = await fetch(settingsUrl);
@@ -192,9 +213,11 @@ async function ensureSettingsPanel() {
             }
 
             container.appendChild(panel);
+            return panel;
         })().catch((error) => {
             console.error(`${logPrefix} Failed to inject settings panel`, error);
             settingsPanelPromise = null;
+            throw error;
         });
     }
 
@@ -224,9 +247,15 @@ function showStatus(message, type = "info", duration = 2500) {
 }
 
 async function populateBuildMeta() {
-    const versionEl = getElement("#cs-build-version");
-    const noteEl = getElement("#cs-build-note");
-    if (!versionEl || !noteEl) {
+    let versionEl;
+    let noteEl;
+    try {
+        [versionEl, noteEl] = await Promise.all([
+            waitForElement("#cs-build-version"),
+            waitForElement("#cs-build-note"),
+        ]);
+    } catch (error) {
+        console.warn(`${logPrefix} Unable to resolve build metadata elements`, error);
         return;
     }
 
@@ -720,7 +749,12 @@ async function init() {
     settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
     extension_settings[extensionName] = settings;
 
-    await ensureSettingsPanel();
+    try {
+        await ensureSettingsPanel();
+    } catch (error) {
+        console.error(`${logPrefix} Unable to initialize settings panel`, error);
+        return;
+    }
     await populateBuildMeta();
     bindUI();
     showStatus("Ready", "info");
