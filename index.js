@@ -14,9 +14,9 @@ import {
     normalizeVariantEntry,
     buildStreamBuffer,
 } from "./src/simple-switcher.js";
-import { getOutfitSlashCommandConfig } from "./src/verbs.js";
+import { createOutfitSlashCommandRegistration, applySlashCommandRegistration } from "./src/slash-command.js";
 
-const extensionName = "SillyTavern-OutfitSwitch";
+const extensionName = "SillyTavern-OutfitSwitch-Testing";
 const logPrefix = "[OutfitSwitch]";
 
 let settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
@@ -1501,18 +1501,12 @@ function bindUI() {
 }
 
 function initSlashCommand() {
-    const slashConfig = getOutfitSlashCommandConfig();
-
-    registerSlashCommand(
-        slashConfig.name,
-        async (args) => {
-            const triggerText = Array.isArray(args) ? args.join(" ") : String(args ?? "");
-            return runTriggerByName(triggerText, "slash");
-        },
-        slashConfig.args,
-        slashConfig.description,
-        false,
-    );
+    try {
+        const registration = createOutfitSlashCommandRegistration(runTriggerByName);
+        applySlashCommandRegistration(registerSlashCommand, registration);
+    } catch (error) {
+        console.error(`${logPrefix} Unable to register slash command`, error);
+    }
 }
 
 async function init() {
