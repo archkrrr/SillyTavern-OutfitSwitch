@@ -16,7 +16,7 @@ import {
 } from "./src/simple-switcher.js";
 import { createOutfitSlashCommandRegistration, applySlashCommandRegistration } from "./src/slash-command.js";
 
-const extensionName = "SillyTavern-OutfitSwitch-Testing";
+const extensionName = "SillyTavern-OutfitSwitch";
 const logPrefix = "[OutfitSwitch]";
 
 let settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
