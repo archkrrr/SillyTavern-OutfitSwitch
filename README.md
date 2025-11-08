@@ -1,12 +1,14 @@
 # Outfit Switcher for SillyTavern
 
-Outfit Switcher is a companion piece to Lenny’s **Character Expressions** extension, just like **Costume Switcher**, and is the slim single-character wardrobe manager spun out of the **Outfit Lab** inside [Costume Switcher for SillyTavern](https://github.com/archkrrr/SillyTavern-CostumeSwitch). It watches streaming responses, fires the right costume the moment a keyword or regex hits, and keeps manual overrides one click away. The extension still works great for focused setups or legacy installs while the Outfit Lab continues forward with richer UI and multi-character support.
+Outfit Switcher is the slim single-character wardrobe manager spun out of the **Outfit Lab** inside [Costume Switcher for SillyTavern](https://github.com/archkrrr/SillyTavern-CostumeSwitch). It watches streaming responses, fires the right costume the moment a keyword or regex hits, and keeps manual overrides one click away. The extension still works great for focused setups or legacy installs while the Outfit Lab continues forward with richer UI and multi-character support.
 
-**Costume Switcher at a glance:** the flagship extension that handles full-cast wardrobe automation, integrates with Character Expressions, and ships the Outfit Lab that inspired this standalone. Install it if you want the complete experience; reach for Outfit Switcher when you need a lighter, single-character tool.
+**Costume Switcher at a glance:** the flagship extension that handles full-cast wardrobe automation, integrates with Character Expressions, and ships the Outfit Lab that inspired this standalone drawer. Install it if you want the complete experience; reach for Outfit Switcher when you need a lighter, single-character tool or compatibility with older builds.
+
+Think of Outfit Switcher as the little brother carved out of the Outfit Lab. Costume Switcher remains the flagship, dressing the whole cast, sharing telemetry with Character Expressions, and evolving the Outfit Lab that now covers single-character workflows too. If you are starting fresh, install **Costume Switcher** and enable **Outfit Lab**—you will get everything documented here plus ensemble automation. Keep Outfit Switcher around only if you prefer its pared-back drawer or need a lightweight alternative for older SillyTavern builds.
 
 Under the hood both extensions listen to streaming output, score the mentions they care about, and update costumes instantly. Costume Switcher layers scene awareness, focus locks, and outfit variants on top, while Outfit Switcher keeps those smarts targeted at a single pipeline. The shared lineage means tips from the Outfit Lab directly improve your Outfit Switcher setup and vice versa.
 
-> **New to the Switcher family?** Start here, then hop over to the Character Expressions README. Together they form a best-friends duo: Expressions handles nuanced emotions, Outfit Switcher handles wardrobe changes.
+> **New to the Switcher family?** Start with **Costume Switcher** → enable **Outfit Lab** for single-character wardrobe control → consult the Character Expressions README for emotion swaps. Return here only if you need the archival Outfit Switcher drawer or a minimal install.
 
 
 ## Contents
@@ -130,7 +132,9 @@ If a trigger does not fire, open the browser console for detailed logs that show
 
 | Command | Description |
 | --- | --- |
-| `/outfitswitch <trigger>` | Launches the outfit mapped to `<trigger>`. Unknown triggers or disabled states are safely ignored. |
+| `/outfitswitch <trigger>` | Manually activates the Outfit Switcher trigger named `<trigger>`. Unknown triggers or disabled states are safely ignored. |
+
+> **Note:** `/trigger` remains the built-in STScript command in SillyTavern. Outfit Switcher only registers `/outfitswitch` and does not claim any aliases.
 
 ---
 
