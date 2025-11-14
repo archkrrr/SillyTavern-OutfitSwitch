@@ -25,9 +25,8 @@ Under the hood both extensions listen to streaming output, score the mentions th
     3. [Trigger Table](#trigger-table)
     4. [Status & Tips](#status--tips)
 8. [Understanding Automatic Switches](#understanding-automatic-switches)
-9. [Slash Command Reference](#slash-command-reference)
-10. [Troubleshooting Checklist](#troubleshooting-checklist)
-11. [Support & Contributions](#support--contributions)
+9. [Troubleshooting Checklist](#troubleshooting-checklist)
+10. [Support & Contributions](#support--contributions)
 
 ---
 
@@ -36,7 +35,7 @@ Under the hood both extensions listen to streaming output, score the mentions th
 - **Single-character focus** – Keep one avatar in the spotlight and let Outfit Switcher handle every outfit change for that performer.
 - **Stream-aware triggers** – Keywords and regexes are evaluated as tokens arrive, ensuring the correct outfit lands before the message finishes rendering.
 - **Variant shortcuts** – Pair friendly names with costume folders so dramatic looks, seasonal outfits, and casual wear are just a click away.
-- **Manual safety net** – Fire any variant from the panel or via slash command without waiting for automation.
+- **Manual safety net** – Fire any variant from the panel without waiting for automation.
 - **Non-destructive switching** – Every action resolves to `/costume` calls; speaker focus never changes, avoiding accidental role swaps.
 
 ---
@@ -97,7 +96,7 @@ This structure mirrors the Outfit Lab’s per-character view: one hero with opti
 4. Create trigger rows with friendly names, match text (plain keywords or regex), and the variant to run.
 5. Talk with your model—when the trigger phrase appears, Outfit Switcher fires the mapped outfit automatically.
 
-You can always click a variant’s **Run** button or use the slash command to override automation instantly.
+You can always click a variant’s **Run** button to override automation instantly.
 
 ---
 
@@ -125,16 +124,6 @@ Inline banners surface validation errors, successful saves, or warnings when a f
 - **Reset events** – Clearing chat or regenerating a message resets the buffer, ensuring fresh context for the next response.
 
 If a trigger does not fire, open the browser console for detailed logs that show the processed buffer and which triggers were evaluated.
-
----
-
-## Slash Command Reference
-
-| Command | Description |
-| --- | --- |
-| `/outfitswitch <trigger>` | Manually activates the Outfit Switcher trigger named `<trigger>`. Unknown triggers or disabled states are safely ignored. |
-
-> **Note:** `/trigger` remains the built-in STScript command in SillyTavern. Outfit Switcher only registers `/outfitswitch` and does not claim any aliases.
 
 ---
 
