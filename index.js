@@ -1,12 +1,11 @@
 import { extension_settings } from "../../../extensions.js";
 import { saveSettingsDebounced, event_types, eventSource } from "../../../../script.js";
-import { executeSlashCommandsOnChatInput, registerSlashCommand } from "../../../slash-commands.js";
+import { executeSlashCommandsOnChatInput } from "../../../slash-commands.js";
 import {
     DEFAULT_PROFILE_NAME,
     defaultSettings,
     ensureProfileShape,
     ensureSettingsShape,
-    findCostumeForTrigger,
     findCostumeForText,
     composeCostumePath,
     normalizeCostumeFolder,
@@ -14,9 +13,8 @@ import {
     normalizeVariantEntry,
     buildStreamBuffer,
 } from "./src/simple-switcher.js";
-import { createOutfitSlashCommandRegistration, applySlashCommandRegistration } from "./src/slash-command.js";
 
-const extensionName = "SillyTavern-OutfitSwitch";
+const extensionName = "SillyTavern-OutfitSwitch-Testing";
 const logPrefix = "[OutfitSwitch]";
 
 let settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
@@ -1030,9 +1028,6 @@ async function issueCostume(folder, { source = "ui" } = {}) {
     const normalized = normalizeCostumeFolder(folder);
     if (!normalized) {
         const message = "Provide an outfit folder for the focus character.";
-        if (source === "slash") {
-            return message;
-        }
         showStatus(message, "error");
         return message;
     }
@@ -1040,17 +1035,11 @@ async function issueCostume(folder, { source = "ui" } = {}) {
     try {
         await executeSlashCommandsOnChatInput(`/costume \\${normalized}`);
         const successMessage = `Updated the focus character's outfit to <b>${escapeHtml(normalized)}</b>.`;
-        if (source === "slash") {
-            return successMessage;
-        }
         showStatus(successMessage, "success");
         return successMessage;
     } catch (err) {
         console.error(`${logPrefix} Failed to execute /costume for "${normalized}"`, err);
         const failureMessage = `Failed to update the focus character's outfit to <b>${escapeHtml(normalized)}</b>.`;
-        if (source === "slash") {
-            return failureMessage;
-        }
         showStatus(failureMessage, "error", 4000);
         return failureMessage;
     }
@@ -1388,30 +1377,6 @@ function handleBaseFolderInput(event) {
     updateProfilePill();
 }
 
-async function runTriggerByName(triggerName, source = "slash") {
-    flushAutoSave({ showStatusMessage: false });
-    if (!settings.enabled) {
-        const disabledMessage = "Outfit Switcher is disabled for the focus character.";
-        if (source === "slash") {
-            return disabledMessage;
-        }
-        showStatus(disabledMessage, "error");
-        return disabledMessage;
-    }
-
-    const costume = findCostumeForTrigger(settings, triggerName);
-    if (!costume) {
-        const unknownMessage = `No outfit trigger named "${escapeHtml(triggerName || "")}".`;
-        if (source === "slash") {
-            return unknownMessage;
-        }
-        showStatus(unknownMessage, "error");
-        return unknownMessage;
-    }
-
-    return issueCostume(costume, { source });
-}
-
 function bindUI() {
     const enableCheckbox = getElement("#os-enable");
     const baseFolderInput = getElement("#os-base-folder");
@@ -1500,15 +1465,6 @@ function bindUI() {
     refreshProfileUI();
 }
 
-function initSlashCommand() {
-    try {
-        const registration = createOutfitSlashCommandRegistration(runTriggerByName);
-        applySlashCommandRegistration(registerSlashCommand, registration);
-    } catch (error) {
-        console.error(`${logPrefix} Unable to register slash command`, error);
-    }
-}
-
 async function init() {
     settings = ensureSettingsShape(extension_settings[extensionName] || defaultSettings);
     extension_settings[extensionName] = settings;
@@ -1524,8 +1480,6 @@ async function init() {
     registerAutomationHandlers();
     showStatus("Ready", "info");
 }
-
-initSlashCommand();
 
 if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", () => {
